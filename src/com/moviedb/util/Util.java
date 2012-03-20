@@ -27,7 +27,7 @@ public class Util {
         return properties;
     }
 
-    public void readProperties(String path) {
+    public void readProperties(String path) throws IOException {
 
         properties = new Properties();
         FileInputStream fis;
@@ -39,9 +39,8 @@ public class Util {
                 properties.load(fis);
             }
             fis.close();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-            ex.printStackTrace();
+        } catch (IOException ex) {            
+            throw ex;
         }
     }
 }
