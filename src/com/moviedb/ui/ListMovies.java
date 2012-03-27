@@ -20,6 +20,8 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -28,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import org.json.JSONException;
 
@@ -36,59 +39,13 @@ import org.json.JSONException;
  * @author rxavier
  */
 public class ListMovies extends javax.swing.JFrame {
-
+    
     private static final ResourceBundle bundle = ResourceBundle.getBundle("com/moviedb/ui/Bundle");
 
     /** Creates new form ListMovies */
     public ListMovies() {
         initComponents();
-        listAllFilesDir();
-    }
-
-    private void listAllFilesDir() {
-        Util util = new Util();
-        try {
-            util.readProperties("app.config");
-
-            String path = util.getProperties().getProperty("path", "vazio");
-
-            DefaultListModel modelo = new DefaultListModel() {
-
-                @Override
-                public Object getElementAt(int i) {
-                    return ((File) super.getElementAt(i)).getName();
-                }
-            };
-
-            if (!path.equals("vazio")) {
-                for (String p : path.split(";")) {
-
-                    File directory = new File(p);
-                    File[] directories = null;
-                    if (directory.isDirectory()) {
-                        directories = directory.listFiles(new FileFilter() {
-
-                            public boolean accept(File pathname) {
-                                return pathname.isDirectory();
-
-                            }
-                        });
-                    }
-                    if (directories != null) {
-                        System.out.println(directories.length);
-                        for (File obj : directories) {
-                            modelo.addElement(obj);
-                        }
-                    }
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, bundle.getString("TAG PATH DONT FOUND"));
-            }
-            listMovies.setModel(modelo);
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, bundle.getString("FILE app.config DONT FOUND"));
-        }
-
+        populateListDir();
     }
 
     /** This method is called from within the constructor to
@@ -147,6 +104,9 @@ public class ListMovies extends javax.swing.JFrame {
         txtGenres = new javax.swing.JTextArea();
         jScrollPane6 = new javax.swing.JScrollPane();
         txtWriter = new javax.swing.JTextArea();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu2 = new javax.swing.JMenu();
+        mItemOrganize = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/moviedb/ui/Bundle"); // NOI18N
@@ -451,6 +411,20 @@ public class ListMovies extends javax.swing.JFrame {
                 .addGap(215, 215, 215))
         );
 
+        jMenu2.setText("Tools");
+
+        mItemOrganize.setText("Organize Files");
+        mItemOrganize.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mItemOrganizeActionPerformed(evt);
+            }
+        });
+        jMenu2.add(mItemOrganize);
+
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -472,7 +446,7 @@ public class ListMovies extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
                             .addComponent(btnOpen, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -504,24 +478,24 @@ public class ListMovies extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnListAll)
                     .addComponent(btnUpdate))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
-        listAllFilesDir();
+        populateListDir();
     }//GEN-LAST:event_btnUpdateActionPerformed
-
+    
     private void listMoviesValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listMoviesValueChanged
         int[] selected = listMovies.getSelectedIndices();
         if (selected.length == 1) {
             clearFields();
             diretorioSelecionado = (File) ((DefaultListModel) listMovies.getModel()).get(listMovies.getSelectedIndex());
-
+            
             String name = diretorioSelecionado.getName();
-            Pattern pattern = Pattern.compile("#.tt\\d{7,}$");
+            Pattern pattern = Pattern.compile("#.tt\\d{7,}");
             Matcher mIMDBId = pattern.matcher(name);
             if (mIMDBId.find()) {
                 txtImdbID.setText(mIMDBId.group(0).replace("#", "").trim());
@@ -531,10 +505,29 @@ public class ListMovies extends javax.swing.JFrame {
             if (mYear.find()) {
                 txtYear.setText(mYear.group(0));
             }
-
-            name = name.replaceAll("#.tt\\d{7,}$", "").replaceAll("(19|20)\\d\\d", "").replaceAll("\\.|\\[|]|\\-", " ").trim();
+            
+            name = name.replaceAll("#.tt\\d{7,}", "").replaceAll("(19|20)\\d\\d", "").replaceAll("\\.|\\[|]|\\-", " ").trim();
+            
+            Util util = new Util();
+            try {
+                util.readProperties("app.config");
+                String path = util.getProperties().getProperty("replaceRegex", "vazio");
+                
+                for (String p : path.split(" ")) {
+                    name = name.replaceAll(p.trim(), "");
+                }
+                
+                
+            } catch (IOException ex) {
+                Logger.getLogger(ListMovies.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            
+            
+            
+            
             txtTitle.setText(name);
-
+            
         } else if (selected.length > 1) {
             clearFields();
             dao = new DAOMovie();
@@ -549,15 +542,15 @@ public class ListMovies extends javax.swing.JFrame {
                     }
                 }
             }
-
+            
             addListMovies(moviesFounded);
         }
     }//GEN-LAST:event_listMoviesValueChanged
-
+    
     private void btnSerachInsideActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSerachInsideActionPerformed
         searchInside();
     }//GEN-LAST:event_btnSerachInsideActionPerformed
-
+    
     private void btnSerachOutsideActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSerachOutsideActionPerformed
         try {
             searchOutside();
@@ -569,14 +562,14 @@ public class ListMovies extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, bundle.getString("UNKNOW ERROR"));
         }
     }//GEN-LAST:event_btnSerachOutsideActionPerformed
-
+    
     private void btnRenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRenameActionPerformed
         if (!txtTitle.getText().trim().isEmpty()) {
             if (listMovies.getSelectedIndex() >= 0) {
                 diretorioSelecionado = (File) ((DefaultListModel) listMovies.getModel()).get(listMovies.getSelectedIndex());
                 if (tMovies.getSelectedRow() >= 0) {
                     movie = (Movie) ((ObjectTableModel) tMovies.getModel()).getRowObject(tMovies.getSelectedRow());
-
+                    
                     String name = "";
                     if (ckbTitle.isSelected()) {
                         name = movie.getTitle();
@@ -592,18 +585,18 @@ public class ListMovies extends javax.swing.JFrame {
                     } else {
                         rename(diretorioSelecionado, diretorioSelecionado.getName() + " # " + movie.getImdbid());
                     }
-                    listAllFilesDir();
+                    populateListDir();
                 } else {
                     JOptionPane.showMessageDialog(null, bundle.getString("SELECT ONE MOVIE"));
                 }
             }
         }
     }//GEN-LAST:event_btnRenameActionPerformed
-
+    
     private void btnListAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListAllActionPerformed
         listAllSavedMovies();
     }//GEN-LAST:event_btnListAllActionPerformed
-
+    
     private void tMoviesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tMoviesMouseClicked
         try {
             if (evt.getClickCount() == 1) {
@@ -618,15 +611,18 @@ public class ListMovies extends javax.swing.JFrame {
                     populateDetails(movie);
                 }
             }
-
+            
         } catch (Exception ex) {
             Logger.getLogger(ListMovies.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_tMoviesMouseClicked
-
+    
     private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenActionPerformed
-
     }//GEN-LAST:event_btnOpenActionPerformed
+    
+    private void mItemOrganizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemOrganizeActionPerformed
+        organizeFiles();
+    }//GEN-LAST:event_mItemOrganizeActionPerformed
 
     /**
      * @param args the command line arguments
@@ -657,7 +653,7 @@ public class ListMovies extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
-
+            
             public void run() {
                 new ListMovies().setVisible(true);
             }
@@ -686,6 +682,8 @@ public class ListMovies extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -699,6 +697,7 @@ public class ListMovies extends javax.swing.JFrame {
     private javax.swing.JLabel lblVotes;
     private javax.swing.JLabel lblYear;
     private javax.swing.JList listMovies;
+    private javax.swing.JMenuItem mItemOrganize;
     private javax.swing.JPanel pDetails;
     private javax.swing.JPanel pPoster;
     private javax.swing.JRadioButton rbDeanclatworthy;
@@ -717,13 +716,13 @@ public class ListMovies extends javax.swing.JFrame {
     private List<Movie> movies;
     private SearchIMDB search;
     private File diretorioSelecionado;
-
+    
     private void clearFields() {
         txtTitle.setText("");
         txtYear.setText("");
         txtImdbID.setText("");
     }
-
+    
     private void clearDetails() {
         txtActors.setText("");
         txtGenres.setText("");
@@ -735,14 +734,14 @@ public class ListMovies extends javax.swing.JFrame {
         txtGenres.setText("");
         lblYear.setText("");
     }
-
+    
     private void populateFields(Movie movie) {
         clearFields();
         txtTitle.setText(movie.getTitle());
         txtYear.setText(String.valueOf(movie.getYear()));
         txtImdbID.setText(movie.getImdbid());
     }
-
+    
     private void populateDetails(Movie movie) {
         clearDetails();
         txtActors.setText(movie.getActors());
@@ -754,44 +753,73 @@ public class ListMovies extends javax.swing.JFrame {
         lblVotes.setText(String.valueOf(movie.getVotes()));
         txtWriter.setText(movie.getWriter());
         lblYear.setText(String.valueOf(movie.getYear()));
-
+        
     }
-
+    
     private void addListMovies(Movie obj) {
         movies = new ArrayList<Movie>();
         movies.add(obj);
         addListMovies(movies);
     }
-
+    
     private void clearMoviesTable() {
         while (tMovies.getModel().getRowCount() > 0) {
             ((DefaultTableModel) tMovies.getModel()).removeRow(0);
         }
     }
-
+    
     private String getMoviesID(String value) {
         if (!value.trim().isEmpty()) {
-
-            int position = value.indexOf("#") + 1;
-            value = value.substring(position).trim();
-
+            
+            int positionStart = value.indexOf("#") + 1;
+            int positionEnd = value.lastIndexOf("_");
+            if (positionEnd == -1) {
+                value = value.substring(positionStart).trim();
+            } else {
+                value = value.substring(positionStart, positionEnd);
+            }
+            
             return value;
         }
         return "";
     }
-
+    
     private void addListMovies(List<Movie> objs) {
         clearMoviesTable();
         ObjectTableModel modelo = (ObjectTableModel) tMovies.getModel();
         modelo.setRowObject(objs.toArray());
         tMovies.setModel(modelo);
     }
-
+    
     private void rename(File file, String newName) {
+        File filePath = file.getParentFile();
+        File[] directories = null;
+        final String name = newName;
+        if (filePath.isDirectory()) {
+            directories = filePath.listFiles(new FileFilter() {
+                
+                public boolean accept(File pathname) {
+                    if (pathname.isDirectory()) {
+                        if (pathname.getName().equals(name)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                }
+            });
+        }
+        if (directories.length > 0) {
+            newName = newName + " " + (directories.length + 1);
+        }
+        
+        
         newName = newName.replace("/", " ");
         file.renameTo(new File(file.getParent() + "/" + newName));
     }
-
+    
     private void searchInside() {
         dao = new DAOMovie();
         if (!txtImdbID.getText().trim().isEmpty()) {
@@ -806,16 +834,19 @@ public class ListMovies extends javax.swing.JFrame {
         clearMoviesTable();
         if (movie != null) {
             addListMovies(movie);
+            populateDetails(movie);
+            ListSelectionModel selectionModel = tMovies.getSelectionModel();
+            selectionModel.setSelectionInterval(0, 1);
         }
     }
-
+    
     private void searchOutside() throws IOException, JSONException, Exception {
         search = new SearchIMDB();
-
+        
         String title = null;
         int year = 0;
         String imdbID = null;
-
+        
         if (!txtTitle.getText().trim().isEmpty()) {
             title = txtTitle.getText().trim();
         }
@@ -836,44 +867,47 @@ public class ListMovies extends javax.swing.JFrame {
         if (movie.getImdbid() != null) {
             dao = new DAOMovie();
             Movie movieFounded = dao.buscar(movie.getTitle(), movie.getYear());
-
+            
             if (!movie.equals(movieFounded)) {
                 dao.salvar(movie);
             }
-
+            
             if (movie != null) {
                 addListMovies(movie);
+                populateDetails(movie);
+                ListSelectionModel selectionModel = tMovies.getSelectionModel();
+                selectionModel.setSelectionInterval(0, 1);
             }
-
+            
             populateFields(movie);
         } else {
             JOptionPane.showMessageDialog(null, bundle.getString("NO RECORDS FOUND"));
         }
     }
-
+    
     private ObjectTableModel getModel() {
-
+        
         return (new com.moviedb.ui.ObjectTableModel(
                 new Object[][]{},
                 new String[]{
                     "IMDB ID", "TITLE", "RATING"
                 }) {
-
+            
             Class[] types = new Class[]{
                 java.lang.String.class, java.lang.String.class, java.lang.Double.class
             };
             boolean[] canEdit = new boolean[]{
                 false, false, false
             };
-
+            
             public Class getColumnClass(int columnIndex) {
                 return types[columnIndex];
             }
-
+            
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit[columnIndex];
             }
-
+            
             public Object getValueAt(int row, int column) {
                 switch (column) {
                     case 0:
@@ -887,12 +921,145 @@ public class ListMovies extends javax.swing.JFrame {
                 }
             }
         });
-
+        
     }
-
+    
     private void listAllSavedMovies() {
         dao = new DAOMovie();
         movies = dao.listar();
         addListMovies(movies);
+    }
+    
+    private void populateListDir() {
+        DefaultListModel modelo = new DefaultListModel() {
+            
+            @Override
+            public Object getElementAt(int i) {
+                return ((File) super.getElementAt(i)).getName();
+            }
+        };
+        Collection<File> dirsFounded = listAllDirByPath();
+        for (File file : dirsFounded) {
+            modelo.addElement(file);
+        }
+        
+        listMovies.setModel(modelo);
+        
+    }
+    
+    private Collection<File> listFilesByPath() {
+        Util util = new Util();
+        try {
+            util.readProperties("app.config");
+            
+            String path = util.getProperties().getProperty("path", "vazio");
+            
+            Collection<File> filesFounded = new ArrayList<File>();
+            
+            if (!path.equals("vazio")) {
+                for (String p : path.split(";")) {
+                    
+                    File directory = new File(p);
+                    File[] files = null;
+                    if (directory.isDirectory()) {
+                        files = directory.listFiles(new FileFilter() {
+                            
+                            public boolean accept(File pathname) {
+                                return pathname.isFile();
+                                
+                            }
+                        });
+                    }
+                    if (files != null) {
+                        System.out.println(files.length);
+                        filesFounded.addAll(Arrays.asList(files));
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, bundle.getString("TAG PATH DONT FOUND"));
+            }
+            
+            return filesFounded;
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, bundle.getString("FILE app.config DONT FOUND"));
+            return new ArrayList<File>();
+        }
+        
+    }
+    
+    private Collection<File> listAllDirByPath() {
+        Util util = new Util();
+        try {
+            util.readProperties("app.config");
+            
+            String path = util.getProperties().getProperty("path", "vazio");            
+            
+            Collection<File> dirFounded = new ArrayList<File>();
+            
+            if (!path.equals("vazio")) {
+                for (String p : path.split(";")) {
+                    
+                    File directory = new File(p);
+                    File[] directories = null;
+                    if (directory.isDirectory()) {
+                        directories = directory.listFiles(new FileFilter() {
+                            
+                            public boolean accept(File pathname) {
+                                return pathname.isDirectory();
+                                
+                            }
+                        });
+                    }
+                    if (directories != null) {
+                        System.out.println(directories.length);
+                        dirFounded.addAll(Arrays.asList(directories));
+                    }
+                }
+                return dirFounded;
+            } else {
+                JOptionPane.showMessageDialog(null, bundle.getString("TAG PATH DONT FOUND"));
+                return new ArrayList<File>();
+            }
+            
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, bundle.getString("FILE app.config DONT FOUND"));
+            return new ArrayList<File>();
+        }
+        
+    }
+    
+    private void organizeFiles() {
+        Util util = new Util();
+        try {
+            util.readProperties("app.config");
+            String extension = util.getProperties().getProperty("extension", "vazio");
+            String[] extensions = extension.split(";");
+            
+            Collection<File> filesFounded = listFilesByPath();
+            
+            for (File file : filesFounded) {
+                if (file.getName().lastIndexOf(".") > -1) {
+                    String nameExtension = file.getName().substring(file.getName().lastIndexOf("."));
+                    String onlyName = file.getName().substring(0, file.getName().lastIndexOf("."));
+                    for (String ex : extensions) {
+                        if (nameExtension.equals(ex)) {
+                            
+                            File newDir = new File(file.getParent() + "/" + onlyName);
+                            boolean success = (newDir).mkdir();
+                            if (success) {
+                                new File(file.getParent() + "/" + onlyName + ".srt").renameTo(new File(newDir.getPath() + "/" + onlyName + ".srt"));
+                                file.renameTo(new File(newDir.getPath() + "/" + file.getName()));
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+            }
+            
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, bundle.getString("FILE app.config DONT FOUND"));
+        }
+        
     }
 }
