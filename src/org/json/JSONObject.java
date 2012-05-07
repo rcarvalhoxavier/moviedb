@@ -443,17 +443,17 @@ public class JSONObject {
      *
      * @param key   A key string.
      * @return      The object associated with the key.
-     * @throws      JSONException if the key is not found.
+     * @throws      if the key is null
      */
     public Object get(String key) throws JSONException {
         if (key == null) {
             throw new JSONException("Null key.");
         }
         Object object = this.opt(key);
-        if (object == null) {
-            throw new JSONException("JSONObject[" + quote(key) +
-                    "] not found.");
-        }
+//        if (object == null) {
+//            throw new JSONException("JSONObject[" + quote(key) +
+//                    "] not found.");
+//        }
         return object;
     }
 
@@ -517,8 +517,7 @@ public class JSONObject {
                 ? ((Number)object).intValue()
                 : Integer.parseInt((String)object);
         } catch (Exception e) {
-            throw new JSONException("JSONObject[" + quote(key) +
-                "] is not an int.");
+            return 0;
         }
     }
 
@@ -551,6 +550,8 @@ public class JSONObject {
      */
     public JSONObject getJSONObject(String key) throws JSONException {
         Object object = this.get(key);
+        if(object == null)
+            return null;
         if (object instanceof JSONObject) {
             return (JSONObject)object;
         }

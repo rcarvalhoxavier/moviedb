@@ -6,8 +6,10 @@ package com.moviedb.model;
 
 import com.moviedb.util.SearchAPI;
 import java.sql.Blob;
+import java.util.Map;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,6 +40,15 @@ public class Movie {
     private int stv;
     private String languages;
     private byte[] poster;
+    private String tagline;
+
+    public String getTagline() {
+        return tagline;
+    }
+
+    public void setTagline(String tagline) {
+        this.tagline = tagline;
+    }
 
     public byte[] getPoster() {
         return poster;
@@ -214,42 +225,61 @@ public class Movie {
                 if (!json.get("Response").toString().equals("True")) {
                     return null;
                 }
-                this.released = (String) json.get("Released");
-                this.runtime = (String) json.get("Runtime");
-                this.posterUrl = (String) json.get("Poster");
-                this.title = (String) json.get("Title");
+                this.released = json.getString("Released");
+                this.runtime = json.getString("Runtime");
+                this.posterUrl = json.getString("Poster");
+                this.title = json.getString("Title");
                 this.year = json.getInt("Year");
-                this.rated = (String) json.get("Rated");
-                this.actors = (String) json.get("Actors");
+                this.rated = json.getString("Rated");
+                this.actors = json.getString("Actors");
                 this.votes = json.getInt("Votes");
-                this.plot = (String) json.get("Plot");
-                this.writer = (String) json.get("Writer");
+                this.plot = json.getString("Plot");
+                this.writer = json.getString("Writer");
                 this.rating = Double.parseDouble(json.get("Rating").toString().equals("n/a") ? "0.0" : json.get("Rating").toString());
-                this.imdbid = (String) json.get("ID");
-                this.genres = (String) json.get("Genre");
+                this.imdbid = json.getString("ID");
+                this.genres = json.getString("Genre");
 
                 break;
             case DeanclatWorthy:
 
                 try {
-                    String error = (String) json.get("error");
+                    String error = json.getString("error");
                     if (!error.isEmpty()) {
                         return null;
                     }
                 } catch (Exception e) {
 
-                    this.imdbid = (String) json.get("imdbid");
-                    this.title = (String) json.get("title");
-                    this.runtime = (String) json.get("runtime");
+                    this.imdbid = json.getString("imdbid");
+                    this.title = json.getString("title");
+                    this.runtime = json.getString("runtime");
                     this.rating = Double.parseDouble(json.get("rating").toString().equals("n/a") ? "0.0" : json.get("rating").toString());
                     this.votes = json.getInt("votes");
-                    this.genres = (String) json.get("genres");
+                    this.genres = json.getString("genres");
                     this.year = json.getInt("year");
-                    this.imdburl = (String) json.get("imdburl");
-                    this.country = (String) json.get("country");
+                    this.imdburl = json.getString("imdburl");
+                    this.country = json.getString("country");
                     this.stv = json.getInt("stv");
-                    this.languages = (String) json.get("languages");
+                    this.languages = json.getString("languages");
                 }
+                break;
+            case AppIMDB:
+                JSONObject js = null;
+                JSONArray ja = null;
+                json = json.getJSONObject("data");
+
+                this.imdbid = json.getString("tconst");
+                this.rating = json.get("rating") != null ? json.getDouble("rating") : 0.0;
+                this.votes = json.getInt("num_votes");
+                js = json.getJSONObject("runtime");
+                this.runtime = String.valueOf(js != null ? js.get("time") : "");
+                this.title = json.getString("title");
+                this.year = json.getInt("year");
+                this.tagline = json.getString("tagline");
+                this.plot = json.getJSONObject("plot") != null ? json.getJSONObject("plot").getString("outline") : "";
+                ja = json.getJSONArray("genres");
+                this.genres = ja.toString().replaceAll("\\[|\\]", "").replaceAll("\\\"", "");
+                js = json.getJSONObject("image");
+                this.posterUrl = js.getString("url");
                 break;
         }
 

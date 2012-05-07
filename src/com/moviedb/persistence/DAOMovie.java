@@ -5,11 +5,18 @@ package com.moviedb.persistence;
 
 import com.moviedb.model.Movie;
 import java.io.Serializable;
+import java.lang.String;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.EntityTransaction;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
 
 public class DAOMovie implements Serializable {
 
@@ -45,7 +52,17 @@ public class DAOMovie implements Serializable {
     }
 
     public Movie buscar(String title) {
-        entityManager = ConnectionFactory.getEntityManager();
+        //        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+//        CriteriaQuery<Apontamento> criteriaQuery = criteriaBuilder.createQuery(Apontamento.class);
+//        Root<Apontamento> apontamento = criteriaQuery.from(Apontamento.class);
+//        
+//        Predicate predicate = criteriaBuilder.and();
+//        
+//        Order order;
+//    
+        
+        entityManager = ConnectionFactory.getEntityManager();              
+        
         Query query = entityManager.createQuery("from Movie f where f.title = ?1");
         query.setParameter(1, title);
 
@@ -57,6 +74,13 @@ public class DAOMovie implements Serializable {
 
     public Movie buscar(String title, int year) {
         entityManager = ConnectionFactory.getEntityManager();
+        
+//         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+//        CriteriaQuery<Movie> criteriaQuery = criteriaBuilder.createQuery(Movie.class);
+//        Root<Movie> movie = criteriaQuery.from(Movie.class);
+//        
+//        Predicate predicate = criteriaBuilder.and();
+        
         Query query = entityManager.createQuery("from Movie f where f.title = ?1 and f.year = ?2");
         query.setParameter(1, title);
         query.setParameter(2, year);
@@ -66,7 +90,7 @@ public class DAOMovie implements Serializable {
         return (lista.isEmpty() ? null : lista.get(0));
     }
 
-    public Movie find(Movie obj) {
+    public Movie buscar(Movie obj) {
         return entityManager.find(Movie.class, obj.getImdbid());
 
     }

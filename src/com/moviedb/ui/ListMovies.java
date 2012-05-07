@@ -12,9 +12,12 @@ package com.moviedb.ui;
 
 import com.moviedb.model.Movie;
 import com.moviedb.persistence.DAOMovie;
+import com.moviedb.util.ImageUtil;
 import com.moviedb.util.SearchAPI;
 import com.moviedb.util.SearchIMDB;
 import com.moviedb.util.Util;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -22,24 +25,32 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.SortedSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import org.json.JSONException;
+import org.apache.log4j.Logger;
+
+import org.apache.log4j.Appender;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.BasicConfigurator;
 
 /**
  *
  * @author rxavier
  */
 public class ListMovies extends javax.swing.JFrame {
-    
+
     private static final ResourceBundle bundle = ResourceBundle.getBundle("com/moviedb/ui/Bundle");
 
     /** Creates new form ListMovies */
@@ -70,8 +81,6 @@ public class ListMovies extends javax.swing.JFrame {
         txtTitle = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         txtImdbID = new javax.swing.JTextField();
-        rbImdbApi = new javax.swing.JRadioButton();
-        rbDeanclatworthy = new javax.swing.JRadioButton();
         btnRename = new javax.swing.JButton();
         btnOpen = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -87,6 +96,7 @@ public class ListMovies extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         pPoster = new javax.swing.JPanel();
+        lblPoster = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
@@ -153,13 +163,6 @@ public class ListMovies extends javax.swing.JFrame {
 
         txtImdbID.setToolTipText(bundle.getString("ListMovies.txtImdbID.toolTipText")); // NOI18N
 
-        buttonGroup1.add(rbImdbApi);
-        rbImdbApi.setSelected(true);
-        rbImdbApi.setText(bundle.getString("ListMovies.rbImdbApi.text")); // NOI18N
-
-        buttonGroup1.add(rbDeanclatworthy);
-        rbDeanclatworthy.setText(bundle.getString("ListMovies.rbDeanclatworthy.text")); // NOI18N
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -172,23 +175,19 @@ public class ListMovies extends javax.swing.JFrame {
                             .addComponent(jLabel2)
                             .addComponent(jLabel1))
                         .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(txtYear, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel3)
                                 .addGap(18, 18, 18)
-                                .addComponent(txtImdbID, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE))
-                            .addComponent(txtTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)))
+                                .addComponent(txtImdbID, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtTitle)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(btnSerachInside)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnSerachOutside)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(rbImdbApi)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(rbDeanclatworthy)))
-                .addContainerGap())
+                        .addComponent(btnSerachOutside)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -206,9 +205,7 @@ public class ListMovies extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSerachInside)
-                    .addComponent(btnSerachOutside)
-                    .addComponent(rbImdbApi)
-                    .addComponent(rbDeanclatworthy, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnSerachOutside))
                 .addContainerGap())
         );
 
@@ -265,15 +262,20 @@ public class ListMovies extends javax.swing.JFrame {
 
         pPoster.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
+        lblPoster.setText(bundle.getString("ListMovies.lblPoster.text")); // NOI18N
+        lblPoster.setToolTipText(bundle.getString("ListMovies.lblPoster.toolTipText")); // NOI18N
+
         javax.swing.GroupLayout pPosterLayout = new javax.swing.GroupLayout(pPoster);
         pPoster.setLayout(pPosterLayout);
         pPosterLayout.setHorizontalGroup(
             pPosterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 146, Short.MAX_VALUE)
+            .addGroup(pPosterLayout.createSequentialGroup()
+                .addComponent(lblPoster, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pPosterLayout.setVerticalGroup(
             pPosterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 193, Short.MAX_VALUE)
+            .addComponent(lblPoster, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
         );
 
         jLabel9.setText(bundle.getString("ListMovies.jLabel9.text")); // NOI18N
@@ -343,30 +345,28 @@ public class ListMovies extends javax.swing.JFrame {
                 .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pDetailsLayout.createSequentialGroup()
                         .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE)
+                            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
+                            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
                             .addGroup(pDetailsLayout.createSequentialGroup()
-                                .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
-                                    .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
-                                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
-                                    .addGroup(pDetailsLayout.createSequentialGroup()
-                                        .addComponent(lblYear, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel6)
-                                        .addGap(3, 3, 3)
-                                        .addComponent(lblRating, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(lblRuntime, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE))
+                                .addComponent(lblYear, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(pDetailsLayout.createSequentialGroup()
-                                        .addComponent(jLabel7)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(lblVotes, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(pPoster, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(232, 232, 232)))
+                                .addComponent(jLabel6)
+                                .addGap(3, 3, 3)
+                                .addComponent(lblRating, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblRuntime, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 1295, Short.MAX_VALUE)
+                            .addGroup(pDetailsLayout.createSequentialGroup()
+                                .addComponent(jLabel7)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblVotes, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(1194, 1194, 1194))
+                            .addComponent(pPoster, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(12, 12, 12))
                     .addGroup(pDetailsLayout.createSequentialGroup()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 346, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())))
         );
         pDetailsLayout.setVerticalGroup(
@@ -385,8 +385,8 @@ public class ListMovies extends javax.swing.JFrame {
                     .addComponent(lblVotes, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblRating, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pDetailsLayout.createSequentialGroup()
                         .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(lblRuntime, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -403,12 +403,15 @@ public class ListMovies extends javax.swing.JFrame {
                         .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel9)
                             .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(pPoster, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(pPoster, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel11)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(215, 215, 215))
+                    .addGroup(pDetailsLayout.createSequentialGroup()
+                        .addGap(67, 67, 67)
+                        .addComponent(jLabel11))
+                    .addGroup(pDetailsLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(41, 41, 41))
         );
 
         jMenu2.setText("Tools");
@@ -443,42 +446,43 @@ public class ListMovies extends javax.swing.JFrame {
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnUpdate))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
-                            .addComponent(btnOpen, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(pDetails, javax.swing.GroupLayout.PREFERRED_SIZE, 439, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(btnListAll))
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnOpen, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnListAll, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 475, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pDetails, javax.swing.GroupLayout.PREFERRED_SIZE, 480, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnRename)
-                            .addComponent(ckbTitle)
-                            .addComponent(ckbYear)
-                            .addComponent(ckbImdbID))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(btnRename)
+                                .addComponent(ckbTitle)
+                                .addComponent(ckbYear)
+                                .addComponent(ckbImdbID))
+                            .addComponent(btnOpen))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane1))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addComponent(btnOpen)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 464, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, 0, 0, Short.MAX_VALUE))
-                    .addComponent(pDetails, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 427, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnListAll)
-                    .addComponent(btnUpdate))
-                .addContainerGap(16, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnListAll)
+                            .addComponent(btnUpdate))
+                        .addGap(20, 20, 20))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(pDetails, javax.swing.GroupLayout.PREFERRED_SIZE, 542, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(20, Short.MAX_VALUE))))
         );
 
         pack();
@@ -487,13 +491,13 @@ public class ListMovies extends javax.swing.JFrame {
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
         populateListDir();
     }//GEN-LAST:event_btnUpdateActionPerformed
-    
+
     private void listMoviesValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listMoviesValueChanged
         int[] selected = listMovies.getSelectedIndices();
         if (selected.length == 1) {
             clearFields();
             diretorioSelecionado = (File) ((DefaultListModel) listMovies.getModel()).get(listMovies.getSelectedIndex());
-            
+
             String name = diretorioSelecionado.getName();
             Pattern pattern = Pattern.compile("#.tt\\d{7,}");
             Matcher mIMDBId = pattern.matcher(name);
@@ -505,29 +509,29 @@ public class ListMovies extends javax.swing.JFrame {
             if (mYear.find()) {
                 txtYear.setText(mYear.group(0));
             }
-            
+
             name = name.replaceAll("#.tt\\d{7,}", "").replaceAll("(19|20)\\d\\d", "").replaceAll("\\.|\\[|]|\\-", " ").trim();
-            
+
             Util util = new Util();
             try {
                 util.readProperties("app.config");
                 String path = util.getProperties().getProperty("replaceRegex", "vazio");
-                
+
                 for (String p : path.split(" ")) {
                     name = name.replaceAll(p.trim(), "");
                 }
-                
-                
+
+
             } catch (IOException ex) {
-                Logger.getLogger(ListMovies.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error("Erro ao ler arquivo app.config ", ex);
             }
-            
-            
-            
-            
-            
+
+
+
+
+
             txtTitle.setText(name);
-            
+
         } else if (selected.length > 1) {
             clearFields();
             dao = new DAOMovie();
@@ -542,34 +546,42 @@ public class ListMovies extends javax.swing.JFrame {
                     }
                 }
             }
-            
+
             addListMovies(moviesFounded);
         }
     }//GEN-LAST:event_listMoviesValueChanged
-    
+
     private void btnSerachInsideActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSerachInsideActionPerformed
-        searchInside();
+        try {
+            searchInside();
+        } catch (Exception e) {
+            logger.error(bundle.getString("ERROR DURING READING"), e);
+            JOptionPane.showMessageDialog(null, bundle.getString("ERROR DURING READING"));
+        }
     }//GEN-LAST:event_btnSerachInsideActionPerformed
-    
+
     private void btnSerachOutsideActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSerachOutsideActionPerformed
         try {
             searchOutside();
         } catch (IOException ex) {
+            logger.error(bundle.getString("UNKNOW HOST"), ex);
             JOptionPane.showMessageDialog(null, bundle.getString("UNKNOW HOST"));
         } catch (JSONException ex) {
+            logger.error(bundle.getString("ERROR DURING READING"), ex);
             JOptionPane.showMessageDialog(null, bundle.getString("ERROR DURING READING"));
         } catch (Exception ex) {
+            logger.error(bundle.getString("UNKNOW ERROR"), ex);
             JOptionPane.showMessageDialog(null, bundle.getString("UNKNOW ERROR"));
         }
     }//GEN-LAST:event_btnSerachOutsideActionPerformed
-    
+
     private void btnRenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRenameActionPerformed
         if (!txtTitle.getText().trim().isEmpty()) {
             if (listMovies.getSelectedIndex() >= 0) {
                 diretorioSelecionado = (File) ((DefaultListModel) listMovies.getModel()).get(listMovies.getSelectedIndex());
                 if (tMovies.getSelectedRow() >= 0) {
                     movie = (Movie) ((ObjectTableModel) tMovies.getModel()).getRowObject(tMovies.getSelectedRow());
-                    
+
                     String name = "";
                     if (ckbTitle.isSelected()) {
                         name = movie.getTitle();
@@ -592,11 +604,11 @@ public class ListMovies extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_btnRenameActionPerformed
-    
+
     private void btnListAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListAllActionPerformed
         listAllSavedMovies();
     }//GEN-LAST:event_btnListAllActionPerformed
-    
+
     private void tMoviesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tMoviesMouseClicked
         try {
             if (evt.getClickCount() == 1) {
@@ -611,15 +623,15 @@ public class ListMovies extends javax.swing.JFrame {
                     populateDetails(movie);
                 }
             }
-            
+
         } catch (Exception ex) {
-            Logger.getLogger(ListMovies.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Erro ao ler movie", ex);
         }
     }//GEN-LAST:event_tMoviesMouseClicked
-    
+
     private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenActionPerformed
     }//GEN-LAST:event_btnOpenActionPerformed
-    
+
     private void mItemOrganizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemOrganizeActionPerformed
         organizeFiles();
     }//GEN-LAST:event_mItemOrganizeActionPerformed
@@ -650,10 +662,10 @@ public class ListMovies extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(ListMovies.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        BasicConfigurator.configure();
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
-            
+
             public void run() {
                 new ListMovies().setVisible(true);
             }
@@ -691,6 +703,7 @@ public class ListMovies extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JLabel lblPoster;
     private javax.swing.JLabel lblRating;
     private javax.swing.JLabel lblRuntime;
     private javax.swing.JLabel lblTitle;
@@ -700,8 +713,6 @@ public class ListMovies extends javax.swing.JFrame {
     private javax.swing.JMenuItem mItemOrganize;
     private javax.swing.JPanel pDetails;
     private javax.swing.JPanel pPoster;
-    private javax.swing.JRadioButton rbDeanclatworthy;
-    private javax.swing.JRadioButton rbImdbApi;
     private javax.swing.JTable tMovies;
     private javax.swing.JTextArea txtActors;
     private javax.swing.JTextArea txtGenres;
@@ -716,13 +727,14 @@ public class ListMovies extends javax.swing.JFrame {
     private List<Movie> movies;
     private SearchIMDB search;
     private File diretorioSelecionado;
-    
+    static final Logger logger = Logger.getLogger(ListMovies.class);
+
     private void clearFields() {
         txtTitle.setText("");
         txtYear.setText("");
         txtImdbID.setText("");
     }
-    
+
     private void clearDetails() {
         txtActors.setText("");
         txtGenres.setText("");
@@ -734,15 +746,15 @@ public class ListMovies extends javax.swing.JFrame {
         txtGenres.setText("");
         lblYear.setText("");
     }
-    
+
     private void populateFields(Movie movie) {
         clearFields();
         txtTitle.setText(movie.getTitle());
         txtYear.setText(String.valueOf(movie.getYear()));
         txtImdbID.setText(movie.getImdbid());
     }
-    
-    private void populateDetails(Movie movie) {
+
+    private void populateDetails(Movie movie) throws IOException, InterruptedException {
         clearDetails();
         txtActors.setText(movie.getActors());
         txtGenres.setText(movie.getGenres());
@@ -753,24 +765,36 @@ public class ListMovies extends javax.swing.JFrame {
         lblVotes.setText(String.valueOf(movie.getVotes()));
         txtWriter.setText(movie.getWriter());
         lblYear.setText(String.valueOf(movie.getYear()));
+
+        byte[] img = new Util().readImageFromUrl(movie.getPosterUrl());
+        img = new ImageUtil().resizeImage(img, 261,75);
         
+        java.awt.Image image = java.awt.Toolkit.getDefaultToolkit().getDefaultToolkit().createImage(img);
+
+        
+  
+
+        Icon icon = new ImageIcon(img);
+        lblPoster.setIcon(icon);
+
+
     }
-    
+
     private void addListMovies(Movie obj) {
         movies = new ArrayList<Movie>();
         movies.add(obj);
         addListMovies(movies);
     }
-    
+
     private void clearMoviesTable() {
         while (tMovies.getModel().getRowCount() > 0) {
             ((DefaultTableModel) tMovies.getModel()).removeRow(0);
         }
     }
-    
+
     private String getMoviesID(String value) {
         if (!value.trim().isEmpty()) {
-            
+
             int positionStart = value.indexOf("#") + 1;
             int positionEnd = value.lastIndexOf("_");
             if (positionEnd == -1) {
@@ -778,26 +802,26 @@ public class ListMovies extends javax.swing.JFrame {
             } else {
                 value = value.substring(positionStart, positionEnd);
             }
-            
+
             return value;
         }
         return "";
     }
-    
+
     private void addListMovies(List<Movie> objs) {
         clearMoviesTable();
         ObjectTableModel modelo = (ObjectTableModel) tMovies.getModel();
-        modelo.setRowObject(objs.toArray());
+        modelo.setRowObject(movies.toArray());
         tMovies.setModel(modelo);
     }
-    
+
     private void rename(File file, String newName) {
         File filePath = file.getParentFile();
         File[] directories = null;
         final String name = newName;
         if (filePath.isDirectory()) {
             directories = filePath.listFiles(new FileFilter() {
-                
+
                 public boolean accept(File pathname) {
                     if (pathname.isDirectory()) {
                         if (pathname.getName().equals(name)) {
@@ -814,18 +838,18 @@ public class ListMovies extends javax.swing.JFrame {
         if (directories.length > 0) {
             newName = newName + " " + (directories.length + 1);
         }
-        
-        
+
+
         newName = newName.replace("/", " ");
         file.renameTo(new File(file.getParent() + "/" + newName));
     }
-    
-    private void searchInside() {
+
+    private void searchInside() throws IOException, InterruptedException {
         dao = new DAOMovie();
         if (!txtImdbID.getText().trim().isEmpty()) {
             movie = new Movie();
             movie.setImdbid(txtImdbID.getText().trim());
-            movie = dao.find(movie);
+            movie = dao.buscar(movie);
         } else if (!txtTitle.getText().trim().isEmpty() && !txtYear.getText().trim().isEmpty()) {
             movie = dao.buscar(txtTitle.getText().trim(), Integer.parseInt(txtYear.getText().trim()));
         } else if (!txtTitle.getText().trim().isEmpty() && txtYear.getText().trim().isEmpty()) {
@@ -839,14 +863,14 @@ public class ListMovies extends javax.swing.JFrame {
             selectionModel.setSelectionInterval(0, 1);
         }
     }
-    
+
     private void searchOutside() throws IOException, JSONException, Exception {
         search = new SearchIMDB();
-        
+
         String title = null;
         int year = 0;
         String imdbID = null;
-        
+
         if (!txtTitle.getText().trim().isEmpty()) {
             title = txtTitle.getText().trim();
         }
@@ -857,57 +881,53 @@ public class ListMovies extends javax.swing.JFrame {
             imdbID = txtImdbID.getText().trim();
         }
         if (title != null | year != 0 | imdbID != null) {
-            if (rbImdbApi.isSelected()) {
-                movie = search.search(title, year, imdbID, SearchAPI.IMDBAPI);
-            } else {
-                movie = search.search(title, year, imdbID, SearchAPI.DeanclatWorthy);
-            }
+            movie = search.search(title, year, imdbID, SearchAPI.DeanclatWorthy);
         }
         clearMoviesTable();
         if (movie.getImdbid() != null) {
             dao = new DAOMovie();
-            Movie movieFounded = dao.buscar(movie.getTitle(), movie.getYear());
-            
+            Movie movieFounded = dao.buscar(movie);
+
             if (!movie.equals(movieFounded)) {
                 dao.salvar(movie);
             }
-            
+
             if (movie != null) {
                 addListMovies(movie);
                 populateDetails(movie);
                 ListSelectionModel selectionModel = tMovies.getSelectionModel();
                 selectionModel.setSelectionInterval(0, 1);
             }
-            
+
             populateFields(movie);
         } else {
             JOptionPane.showMessageDialog(null, bundle.getString("NO RECORDS FOUND"));
         }
     }
-    
+
     private ObjectTableModel getModel() {
-        
+
         return (new com.moviedb.ui.ObjectTableModel(
                 new Object[][]{},
                 new String[]{
                     "IMDB ID", "TITLE", "RATING"
                 }) {
-            
+
             Class[] types = new Class[]{
                 java.lang.String.class, java.lang.String.class, java.lang.Double.class
             };
             boolean[] canEdit = new boolean[]{
                 false, false, false
             };
-            
+
             public Class getColumnClass(int columnIndex) {
                 return types[columnIndex];
             }
-            
+
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit[columnIndex];
             }
-            
+
             public Object getValueAt(int row, int column) {
                 switch (column) {
                     case 0:
@@ -921,18 +941,18 @@ public class ListMovies extends javax.swing.JFrame {
                 }
             }
         });
-        
+
     }
-    
+
     private void listAllSavedMovies() {
         dao = new DAOMovie();
         movies = dao.listar();
         addListMovies(movies);
     }
-    
+
     private void populateListDir() {
         DefaultListModel modelo = new DefaultListModel() {
-            
+
             @Override
             public Object getElementAt(int i) {
                 return ((File) super.getElementAt(i)).getName();
@@ -942,31 +962,31 @@ public class ListMovies extends javax.swing.JFrame {
         for (File file : dirsFounded) {
             modelo.addElement(file);
         }
-        
+
         listMovies.setModel(modelo);
-        
+
     }
-    
+
     private Collection<File> listFilesByPath() {
         Util util = new Util();
         try {
             util.readProperties("app.config");
-            
+
             String path = util.getProperties().getProperty("path", "vazio");
-            
+
             Collection<File> filesFounded = new ArrayList<File>();
-            
+
             if (!path.equals("vazio")) {
                 for (String p : path.split(";")) {
-                    
+
                     File directory = new File(p);
                     File[] files = null;
                     if (directory.isDirectory()) {
                         files = directory.listFiles(new FileFilter() {
-                            
+
                             public boolean accept(File pathname) {
                                 return pathname.isFile();
-                                
+
                             }
                         });
                     }
@@ -978,35 +998,35 @@ public class ListMovies extends javax.swing.JFrame {
             } else {
                 JOptionPane.showMessageDialog(null, bundle.getString("TAG PATH DONT FOUND"));
             }
-            
+
             return filesFounded;
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, bundle.getString("FILE app.config DONT FOUND"));
             return new ArrayList<File>();
         }
-        
+
     }
-    
+
     private Collection<File> listAllDirByPath() {
         Util util = new Util();
         try {
             util.readProperties("app.config");
-            
-            String path = util.getProperties().getProperty("path", "vazio");            
-            
+
+            String path = util.getProperties().getProperty("path", "vazio");
+
             Collection<File> dirFounded = new ArrayList<File>();
-            
+
             if (!path.equals("vazio")) {
                 for (String p : path.split(";")) {
-                    
+
                     File directory = new File(p);
                     File[] directories = null;
                     if (directory.isDirectory()) {
                         directories = directory.listFiles(new FileFilter() {
-                            
+
                             public boolean accept(File pathname) {
                                 return pathname.isDirectory();
-                                
+
                             }
                         });
                     }
@@ -1020,30 +1040,30 @@ public class ListMovies extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, bundle.getString("TAG PATH DONT FOUND"));
                 return new ArrayList<File>();
             }
-            
+
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, bundle.getString("FILE app.config DONT FOUND"));
             return new ArrayList<File>();
         }
-        
+
     }
-    
+
     private void organizeFiles() {
         Util util = new Util();
         try {
             util.readProperties("app.config");
             String extension = util.getProperties().getProperty("extension", "vazio");
             String[] extensions = extension.split(";");
-            
+
             Collection<File> filesFounded = listFilesByPath();
-            
+
             for (File file : filesFounded) {
                 if (file.getName().lastIndexOf(".") > -1) {
                     String nameExtension = file.getName().substring(file.getName().lastIndexOf("."));
                     String onlyName = file.getName().substring(0, file.getName().lastIndexOf("."));
                     for (String ex : extensions) {
                         if (nameExtension.equals(ex)) {
-                            
+
                             File newDir = new File(file.getParent() + "/" + onlyName);
                             boolean success = (newDir).mkdir();
                             if (success) {
@@ -1054,12 +1074,12 @@ public class ListMovies extends javax.swing.JFrame {
                         }
                     }
                 }
-                
+
             }
-            
+
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, bundle.getString("FILE app.config DONT FOUND"));
         }
-        
+
     }
 }

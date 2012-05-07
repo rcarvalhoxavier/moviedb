@@ -10,5 +10,6 @@ package com.moviedb.util;
  */
 public enum SearchAPI {
     IMDBAPI,
-    DeanclatWorthy
+    DeanclatWorthy,
+    AppIMDB
 }
