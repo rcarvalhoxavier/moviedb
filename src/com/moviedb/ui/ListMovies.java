@@ -46,6 +46,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.xml.ws.Response;
 import org.json.JSONException;
@@ -781,6 +782,8 @@ public class ListMovies extends javax.swing.JFrame {
         lblVotes.setText("");
         txtGenres.setText("");
         lblYear.setText("");
+        lblPoster.setText("");
+        lblPoster.setIcon(null);
     }
 
     private void populateFilterFields(Movie movie) {
@@ -793,29 +796,37 @@ public class ListMovies extends javax.swing.JFrame {
     private void populateDetails(Movie movie) throws IOException, InterruptedException {
         clearDetails();
 
-        ExecutorService service = Executors.newFixedThreadPool(1);
-        Future<byte[]> task = service.submit(new Request(movie.getPosterUrl()));
+        txtActors.setText(movie.getActors());
+        txtGenres.setText(movie.getGenres());
+        lblRuntime.setText(movie.getRuntime());
+        txtPlot.setText(movie.getPlot());
+        lblRating.setText(String.valueOf(movie.getRating()));
+        lblTitle.setText(movie.getTitle());
+        lblVotes.setText(String.valueOf(movie.getVotes()));
+        txtWriter.setText(movie.getWriter());
+        lblYear.setText(String.valueOf(movie.getYear()));
+        lblPoster.setText(bundle.getString("LOADING"));
+                
 
-        byte[] img;
-        try {
+        final String url;
+        url = movie.getPosterUrl();
+        SwingUtilities.invokeLater(new Runnable() {
 
-            txtActors.setText(movie.getActors());
-            txtGenres.setText(movie.getGenres());
-            lblRuntime.setText(movie.getRuntime());
-            txtPlot.setText(movie.getPlot());
-            lblRating.setText(String.valueOf(movie.getRating()));
-            lblTitle.setText(movie.getTitle());
-            lblVotes.setText(String.valueOf(movie.getVotes()));
-            txtWriter.setText(movie.getWriter());
-            lblYear.setText(String.valueOf(movie.getYear()));
-
-            img = task.get();
-            img = new ImageUtil().resizeImage(img, 261, 75);
-            Icon icon = new ImageIcon(img);
-            lblPoster.setIcon(icon);
-        } catch (ExecutionException ex) {
-            logger.error(ex);
-        }
+            @Override
+            public void run() {
+                try {
+                    byte[] img;
+                    img = Util.getByteFromURL(url);
+                    img = new ImageUtil().resizeImage(img, 261, 75);
+                    Icon icon = new ImageIcon(img);
+                    lblPoster.setIcon(icon);
+                } catch (InterruptedException ex) {
+                    logger.error(ex);
+                } catch (IOException ex) {
+                    logger.error(ex);
+                }
+            }
+        });
     }
 
     private void addMoviesToList(Movie obj) {
