@@ -87,7 +87,7 @@ public class SearchIMDB {
             String request = uri.toASCIIString();
 
             System.out.println(request);
-            json = JSON.readJsonFromUrl(request);
+            json = Util.getJSONFromURL(request);
             System.out.println(json.toString());
             movie = new Movie(json, api);
 
@@ -95,7 +95,7 @@ public class SearchIMDB {
             uri = new URI(search);
             request = uri.toASCIIString();
             System.out.println(request);
-            json = JSON.readJsonFromUrl(request);
+            json = Util.getJSONFromURL(request);
             System.out.println(json.toString());
             movie = new Movie(json, SearchAPI.AppIMDB);
 
