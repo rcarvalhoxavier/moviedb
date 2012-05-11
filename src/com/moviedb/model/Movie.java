@@ -221,7 +221,7 @@ public class Movie {
         }
 
         switch (api) {
-            case IMDBAPI:
+            case IMDBApi:
                 if (!json.get("Response").toString().equals("True")) {
                     return null;
                 }
@@ -268,18 +268,26 @@ public class Movie {
                 json = json.getJSONObject("data");
 
                 this.imdbid = json.getString("tconst");
+                this.imdburl = Imdb.imdb + this.imdbid;
                 this.rating = json.get("rating") != null ? json.getDouble("rating") : 0.0;
                 this.votes = json.getInt("num_votes");
                 js = json.getJSONObject("runtime");
                 this.runtime = String.valueOf(js != null ? js.get("time") : "");
                 this.title = json.getString("title");
                 this.year = json.getInt("year");
-                this.tagline = json.getString("tagline");
+                this.tagline = json.get("tagline") != null ? json.getString("tagline") : "";
                 this.plot = json.getJSONObject("plot") != null ? json.getJSONObject("plot").getString("outline") : "";
                 ja = json.getJSONArray("genres");
                 this.genres = ja.toString().replaceAll("\\[|\\]", "").replaceAll("\\\"", "");
-                js = json.getJSONObject("image");
-                this.posterUrl = js.getString("url");
+                js = json.getJSONObject("image");                
+                this.posterUrl = js != null ? js.getString("url") : "";
+                break;
+            case AppIMDBFind:
+                this.imdbid = json.getString("tconst");
+                this.imdburl = Imdb.imdb + this.imdbid;
+                this.title = json.getString("title");
+                this.year = json.getInt("year");
+                this.posterUrl = json.getJSONObject("image") != null ? json.getJSONObject("image").getString("url") : "";
                 break;
         }
 

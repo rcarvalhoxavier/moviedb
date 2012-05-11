@@ -659,6 +659,12 @@ public class ListMovies extends javax.swing.JFrame {
     }//GEN-LAST:event_tMoviesMouseClicked
 
     private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenActionPerformed
+        try {
+            Util.openURL(movie.getImdburl());
+        } catch (Exception e) {
+            logger.error(e);
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
     }//GEN-LAST:event_btnOpenActionPerformed
 
     private void mItemOrganizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemOrganizeActionPerformed
@@ -806,7 +812,7 @@ public class ListMovies extends javax.swing.JFrame {
         txtWriter.setText(movie.getWriter());
         lblYear.setText(String.valueOf(movie.getYear()));
         lblPoster.setText(bundle.getString("LOADING"));
-                
+
 
         final String url;
         url = movie.getPosterUrl();
@@ -915,42 +921,45 @@ public class ListMovies extends javax.swing.JFrame {
 
     private void searchOutside() throws IOException, JSONException, Exception {
         search = new SearchIMDB();
-
+        movies = Collections.EMPTY_LIST;
         String title = null;
-        int year = 0;
         String imdbID = null;
 
-        if (!txtTitle.getText().trim().isEmpty()) {
-            title = txtTitle.getText().trim();
-        }
-        if (!txtYear.getText().trim().isEmpty()) {
-            year = Integer.parseInt(txtYear.getText().trim());
-        }
         if (!txtImdbID.getText().trim().isEmpty()) {
             imdbID = txtImdbID.getText().trim();
+        } else if (!txtTitle.getText().trim().isEmpty()) {
+            title = txtTitle.getText().trim();
         }
-        if (title != null | year != 0 | imdbID != null) {
-            movie = search.search(title, year, imdbID, SearchAPI.DeanclatWorthy);
+
+        if (imdbID != null) {
+            movie = search.getMaindetails(imdbID, SearchAPI.DeanclatWorthy);
+        } else {
+            movies = search.search(title, SearchAPI.AppIMDBFind);
         }
         clearMoviesTable();
-        if (movie.getImdbid() != null) {
-            dao = new DAOMovie();
-            Movie movieFounded = dao.buscar(movie);
 
-            if (!movie.equals(movieFounded)) {
-                dao.salvar(movie);
-            }
-
-            if (movie != null) {
-                addMoviesToList(movie);
-                populateDetails(movie);
-                ListSelectionModel selectionModel = tMovies.getSelectionModel();
-                selectionModel.setSelectionInterval(0, 1);
-            }
-
-            populateFilterFields(movie);
+        if (!movies.isEmpty()) {
+            addMoviesToList(movies);
         } else {
-            JOptionPane.showMessageDialog(null, bundle.getString("NO RECORDS FOUND"));
+            if (movie.getImdbid() != null) {
+                dao = new DAOMovie();
+                Movie movieFounded = dao.buscar(movie);
+
+                if (!movie.equals(movieFounded)) {
+                    dao.salvar(movie);
+                }
+
+                if (movie != null) {
+                    addMoviesToList(movie);
+                    populateDetails(movie);
+                    ListSelectionModel selectionModel = tMovies.getSelectionModel();
+                    selectionModel.setSelectionInterval(0, 1);
+                }
+
+                populateFilterFields(movie);
+            } else {
+                JOptionPane.showMessageDialog(null, bundle.getString("NO RECORDS FOUND"));
+            }
         }
     }
 
@@ -982,7 +991,7 @@ public class ListMovies extends javax.swing.JFrame {
                     case 0:
                         return ((Movie) getRowObject(row)).getImdbid();
                     case 1:
-                        return ((Movie) getRowObject(row)).getTitle();
+                        return ((Movie) getRowObject(row)).getTitle()+" - "+((Movie) getRowObject(row)).getYear();
                     case 2:
                         return ((Movie) getRowObject(row)).getRating();
                     default:

@@ -4,12 +4,16 @@
  */
 package com.moviedb.util;
 
+import com.moviedb.model.Imdb;
 import com.moviedb.model.Movie;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,16 +23,6 @@ import org.json.JSONObject;
  */
 public class SearchIMDB {
 
-    public static final String appImdb = "http://app.imdb.com/title/";
-    public static final String appImdb_maindetails = "/maindetails";
-    public static final String deanclatworthy = "http://www.deanclatworthy.com/imdb/";
-    public static final String deanclatworthy_title = "?q=";
-    public static final String deanclatworthy_year = "&y=";
-    public static final String deanclatworthy_imdbid = "?id=";
-    public static final String imdbapi = "http://www.imdbapi.com/";
-    public static final String imdbapi_imdbid = "?i=";
-    public static final String imdbapi_title = "?t=";
-    public static final String imdbapi_year = "&y=";
     private JSONObject json = null;
     private Movie movie = null;
 
@@ -36,39 +30,44 @@ public class SearchIMDB {
         String search = null;
 
         switch (api) {
-            case IMDBAPI:
-                search = imdbapi;
+            case IMDBApi:
+                search = Imdb.imdbapi;
                 if (imdbID != null) {
-                    search += imdbapi_imdbid + URLEncoder.encode(imdbID, "UTF-8");
+                    search += Imdb.imdbapi_imdbid + URLEncoder.encode(imdbID, "UTF-8");
                 } else {
                     if (title != null) {
-                        search += imdbapi_title + URLEncoder.encode(title, "UTF-8");
+                        search += Imdb.imdbapi_title + URLEncoder.encode(title, "UTF-8");
                     }
                     if (year > 0) {
-                        search += imdbapi_year + URLEncoder.encode(String.valueOf(year), "UTF-8");
+                        search += Imdb.imdbapi_year + URLEncoder.encode(String.valueOf(year), "UTF-8");
                     }
                 }
                 break;
             case DeanclatWorthy:
-                search = deanclatworthy;
+                search = Imdb.deanclatworthy;
                 if (imdbID != null) {
-                    search += deanclatworthy_imdbid + URLEncoder.encode(imdbID, "UTF-8");
+                    search += Imdb.deanclatworthy_imdbid + URLEncoder.encode(imdbID, "UTF-8");
                 } else {
                     if (title != null) {
-                        search += deanclatworthy_title + URLEncoder.encode(title, "UTF-8");
+                        search += Imdb.deanclatworthy_title + URLEncoder.encode(title, "UTF-8");
                     }
                     if (year > 0) {
-                        search += deanclatworthy_year + URLEncoder.encode(String.valueOf(year), "UTF-8");
+                        search += Imdb.deanclatworthy_year + URLEncoder.encode(String.valueOf(year), "UTF-8");
                     }
                 }
 
                 break;
             case AppIMDB:
-                search = appImdb;
+                search = Imdb.appImdb;
                 if (imdbID != null) {
-                    search += URLEncoder.encode(imdbID, "UTF-8") + appImdb_maindetails;
+                    search += URLEncoder.encode(imdbID, "UTF-8") + Imdb.appImdb_maindetails;
                 }
-
+                break;
+            case AppIMDBFind:
+                search = Imdb.appImdbFind;
+                if (title != null) {
+                    search += URLEncoder.encode(title, "UTF-8");
+                }
                 break;
             default:
                 break;
@@ -78,9 +77,28 @@ public class SearchIMDB {
         return search;
     }
 
-    public Movie search(String title, int year, String imdbID, SearchAPI api) throws IOException, JSONException, URISyntaxException {
-        String search = mountURL(title, year, imdbID, api);
+    public Movie getMaindetails(String imdbID, SearchAPI api) throws IOException, JSONException, URISyntaxException {
+        String search = mountURL(null, 0, imdbID, api);
 
+        if (search != null) {
+            if (api != SearchAPI.AppIMDBFind) {
+                search = mountURL(null, 0, imdbID, SearchAPI.AppIMDB);
+                URI uri = new URI(search);
+                String request = uri.toASCIIString();
+                System.out.println(request);
+                json = Util.getJSONFromURL(request);
+                System.out.println(json.toString());
+                movie = new Movie(json, SearchAPI.AppIMDB);
+
+                System.out.println(movie.toString());
+            }
+        }
+        return movie;
+    }
+
+    public List<Movie> search(String title, SearchAPI api) throws IOException, JSONException, URISyntaxException {
+        String search = mountURL(title, 0, null, api);
+        List<Movie> movies = new ArrayList<Movie>();
         if (search != null) {
 
             URI uri = new URI(search);
@@ -89,19 +107,27 @@ public class SearchIMDB {
             System.out.println(request);
             json = Util.getJSONFromURL(request);
             System.out.println(json.toString());
-            movie = new Movie(json, api);
 
-            search = mountURL(title, year, movie.getImdbid(), SearchAPI.AppIMDB);
-            uri = new URI(search);
-            request = uri.toASCIIString();
-            System.out.println(request);
-            json = Util.getJSONFromURL(request);
-            System.out.println(json.toString());
-            movie = new Movie(json, SearchAPI.AppIMDB);
+            json = json.getJSONObject("data");
+            JSONArray jResults = json.getJSONArray("results");
 
-            System.out.println(movie.toString());
+            for (int i = 0; i < jResults.length(); i++) {
+                JSONObject jsonObject = jResults.getJSONObject(i);
+                if (jsonObject.getString("label").equals(Imdb.imdbTitlesPartial)
+                        || jsonObject.getString("label").equals(Imdb.imdbTitlesExact)
+                        || jsonObject.getString("label").equals(Imdb.imdbPopularTitles)) {
+                    JSONArray list = jsonObject.getJSONArray("list");
+                    for (int x = 0; x < list.length(); x++) {
+                        movies.add(new Movie(list.getJSONObject(x), api));
+                    }
+                }
+
+
+            }
+
+
+
         }
-        return movie;
-
+        return movies;
     }
 }

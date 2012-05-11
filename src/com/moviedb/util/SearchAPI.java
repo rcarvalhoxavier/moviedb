@@ -8,8 +8,9 @@ package com.moviedb.util;
  *
  * @author rxavier
  */
-public enum SearchAPI {
-    IMDBAPI,
+public enum SearchAPI {        
+    IMDBApi,
     DeanclatWorthy,
-    AppIMDB
+    AppIMDB,
+    AppIMDBFind
 }
