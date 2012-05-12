@@ -279,8 +279,23 @@ public class Movie {
                 this.plot = json.getJSONObject("plot") != null ? json.getJSONObject("plot").getString("outline") : "";
                 ja = json.getJSONArray("genres");
                 this.genres = ja.toString().replaceAll("\\[|\\]", "").replaceAll("\\\"", "");
-                js = json.getJSONObject("image");                
+                js = json.getJSONObject("image");
                 this.posterUrl = js != null ? js.getString("url") : "";
+                ja = json.getJSONArray("directors_summary");
+                for (int i = 0; i < ja.length(); i++) {
+                    js = ja.optJSONObject(i).getJSONObject("name");                   
+                    this.director += js.getString("name")+",";                    
+                }
+                ja = json.getJSONArray("writers_summary");
+                for (int i = 0; i < ja.length(); i++) {
+                    js = ja.optJSONObject(i).getJSONObject("name");   
+                    this.writer += js.getString("name")+",";                    
+                }
+                ja = json.getJSONArray("cast_summary");
+                for (int i = 0; i < ja.length(); i++) {
+                    js = ja.optJSONObject(i).getJSONObject("name");   
+                    this.actors += js.getString("name")+",";                    
+                }
                 break;
             case AppIMDBFind:
                 this.imdbid = json.getString("tconst");
