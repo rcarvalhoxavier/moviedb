@@ -48,7 +48,8 @@ public class Util {
             if (fis != null) {
                 properties.load(fis);
             }
-            fis.close();
+            fis.close();            
+            
         } catch (IOException ex) {
             throw ex;
         }

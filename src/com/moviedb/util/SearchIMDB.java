@@ -11,6 +11,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONArray;
@@ -77,7 +78,7 @@ public class SearchIMDB {
         return search;
     }
 
-    public Movie getMaindetails(String imdbID, SearchAPI api) throws IOException, JSONException, URISyntaxException {
+    public Movie getMaindetails(String imdbID, SearchAPI api) throws IOException, JSONException, URISyntaxException, UnknownHostException {
         String search = mountURL(null, 0, imdbID, api);
 
         if (search != null) {
@@ -96,7 +97,7 @@ public class SearchIMDB {
         return movie;
     }
 
-    public List<Movie> search(String title, SearchAPI api) throws IOException, JSONException, URISyntaxException {
+    public List<Movie> search(String title, SearchAPI api) throws IOException, JSONException, URISyntaxException , UnknownHostException {
         String search = mountURL(title, 0, null, api);
         List<Movie> movies = new ArrayList<Movie>();
         if (search != null) {
