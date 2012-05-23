@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
@@ -66,17 +66,25 @@
                       <Component id="ckbImdbID" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Component id="jScrollPane1" min="-2" pref="279" max="-2" attributes="1"/>
-                  <Component id="btnUpdate" alignment="0" min="-2" max="-2" attributes="1"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="btnUpdate" min="-2" max="-2" attributes="1"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="btnListAll" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="btnListAll" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="jPanel1" alignment="0" min="-2" max="-2" attributes="1"/>
-                  <Component id="jScrollPane2" alignment="0" min="-2" pref="474" max="-2" attributes="1"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jPanel1" min="-2" max="-2" attributes="1"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                      <Component id="jScrollPane8" max="32767" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="pDetails" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="pDetails" min="-2" pref="457" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -85,7 +93,7 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="btnRename" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="ckbTitle" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -93,26 +101,21 @@
                           <Component id="ckbImdbID" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jScrollPane2" pref="336" max="32767" attributes="0"/>
-                          </Group>
-                          <Component id="jScrollPane1" alignment="0" pref="464" max="32767" attributes="0"/>
-                      </Group>
+                      <Component id="jScrollPane1" max="32767" attributes="1"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Component id="jPanel1" min="-2" pref="110" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="btnListAll" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="btnUpdate" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="jScrollPane8" pref="0" max="32767" attributes="0"/>
                   </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="pDetails" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="20" max="32767" attributes="0"/>
-                  </Group>
+                  <Component id="pDetails" max="32767" attributes="1"/>
               </Group>
+              <EmptySpace min="-2" pref="49" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="btnUpdate" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnListAll" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -282,25 +285,6 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRenameActionPerformed"/>
       </Events>
     </Component>
-    <Container class="javax.swing.JScrollPane" name="jScrollPane2">
-      <AuxValues>
-        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
-      </AuxValues>
-
-      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
-      <SubComponents>
-        <Component class="javax.swing.JTable" name="tMovies">
-          <Properties>
-            <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="this.getModel()" type="code"/>
-            </Property>
-          </Properties>
-          <Events>
-            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tMoviesMouseClicked"/>
-          </Events>
-        </Component>
-      </SubComponents>
-    </Container>
     <Component class="javax.swing.JButton" name="btnListAll">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
@@ -382,14 +366,14 @@
                           </Group>
                           <Group type="103" alignment="0" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
-                                  <Component id="lblTitle" pref="369" max="32767" attributes="0"/>
+                                  <Component id="lblTitle" max="32767" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="1" attributes="0">
-                                      <Component id="jScrollPane7" pref="158" max="32767" attributes="2"/>
-                                      <Component id="jScrollPane5" alignment="0" pref="158" max="32767" attributes="2"/>
-                                      <Component id="jScrollPane6" alignment="0" pref="158" max="32767" attributes="2"/>
+                                      <Component id="jScrollPane7" max="32767" attributes="2"/>
+                                      <Component id="jScrollPane5" alignment="0" max="32767" attributes="2"/>
+                                      <Component id="jScrollPane6" alignment="0" max="32767" attributes="2"/>
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="lblYear" min="-2" pref="51" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
@@ -397,8 +381,8 @@
                                           <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
                                           <Component id="lblRating" min="-2" pref="51" max="-2" attributes="0"/>
                                       </Group>
-                                      <Component id="lblRuntime" alignment="0" pref="158" max="32767" attributes="0"/>
-                                      <Component id="jScrollPane4" alignment="0" pref="158" max="32767" attributes="2"/>
+                                      <Component id="lblRuntime" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane4" alignment="0" max="32767" attributes="2"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
@@ -471,9 +455,9 @@
                       <Component id="jScrollPane3" min="-2" pref="106" max="-2" attributes="0"/>
                       <Component id="jLabel11" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="-2" pref="47" max="-2" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="btnOpen" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -528,7 +512,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="lblPoster" min="-2" pref="171" max="-2" attributes="0"/>
-                      <EmptySpace pref="1" max="32767" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -743,6 +727,25 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnOpenActionPerformed"/>
+          </Events>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JScrollPane" name="jScrollPane8">
+      <AuxValues>
+        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+      </AuxValues>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+      <SubComponents>
+        <Component class="org.jdesktop.swingx.JXTable" name="tMovies">
+          <Properties>
+            <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="this.getModel()" type="code"/>
+            </Property>
+          </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tMoviesMouseClicked"/>
           </Events>
         </Component>
       </SubComponents>

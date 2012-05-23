@@ -4,19 +4,14 @@
  */
 package com.moviedb.util;
 
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGEncodeParam;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
-import java.awt.Container;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.MediaTracker;
-import java.awt.RenderingHints;
-import java.awt.Toolkit;
+
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import javax.imageio.ImageIO;
 
 /**
  * Utility class for images. This class contains commonly used actions on uploaded images by users, 
@@ -100,15 +95,10 @@ public class ImageUtil implements Serializable {
         
         //Save 'image' to ByteArrayOutputStream, and create a JPEGImageEncoder to encode the 'bufferedImage'
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        JPEGImageEncoder imageEncoder = JPEGCodec.createJPEGEncoder(outputStream);
-        JPEGEncodeParam encodeParam = imageEncoder.getDefaultJPEGEncodeParam(bufferedImage);
         
-        //Modify the resized image quality according the original one
-        encodeParam.setQuality((float)quality / 100.0f, false);
-        imageEncoder.setJPEGEncodeParam(encodeParam);
-        imageEncoder.encode(bufferedImage);
         
         //resizedImage[] is the final result after all modifications
+        ImageIO.write(bufferedImage,"jpeg", outputStream);
         byte[] resizedImage = outputStream.toByteArray();
         outputStream.close();
         

@@ -4,9 +4,7 @@
  */
 package com.moviedb.model;
 
-import com.moviedb.util.SearchAPI;
-import java.sql.Blob;
-import java.util.Map;
+import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import org.json.JSONArray;
@@ -14,11 +12,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- *
- * @author rxavier
+ * 
+ * @author rcarvalhoxavier
  */
 @Entity
-public class Movie {
+public class Movie implements Serializable {
 
     @Id
     private String imdbid;
@@ -32,30 +30,20 @@ public class Movie {
     private double rating;
     private int votes;
     private String genres;
-    private String released;
     private int year;
-    private String rated;
     private String imdburl;
-    private String country;
-    private int stv;
-    private String languages;
-    private byte[] poster;
     private String tagline;
 
+    /**
+     * 
+     * @return 
+     */
     public String getTagline() {
         return tagline;
     }
 
     public void setTagline(String tagline) {
         this.tagline = tagline;
-    }
-
-    public byte[] getPoster() {
-        return poster;
-    }
-
-    public void setPoster(byte[] poster) {
-        this.poster = poster;
     }
 
     public String getActors() {
@@ -90,36 +78,12 @@ public class Movie {
         this.posterUrl = posterUrl;
     }
 
-    public String getRated() {
-        return rated;
-    }
-
-    public void setRated(String rated) {
-        this.rated = rated;
-    }
-
-    public String getReleased() {
-        return released;
-    }
-
-    public void setReleased(String released) {
-        this.released = released;
-    }
-
     public String getWriter() {
         return writer;
     }
 
     public void setWriter(String writer) {
         this.writer = writer;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
     }
 
     public String getGenres() {
@@ -146,14 +110,6 @@ public class Movie {
         this.imdburl = imdburl;
     }
 
-    public String getLanguages() {
-        return languages;
-    }
-
-    public void setLanguages(String languages) {
-        this.languages = languages;
-    }
-
     public double getRating() {
         return rating;
     }
@@ -168,14 +124,6 @@ public class Movie {
 
     public void setRuntime(String runtime) {
         this.runtime = runtime;
-    }
-
-    public int getStv() {
-        return stv;
-    }
-
-    public void setStv(int stv) {
-        this.stv = stv;
     }
 
     public String getTitle() {
@@ -206,108 +154,55 @@ public class Movie {
     }
 
     public Movie(JSONObject json, SearchAPI api) throws JSONException {
-        jsonToObject(json, api);
+
+        if (json != null) {
+            switch (api) {
+                case AppIMDB:
+                    JSONObject js = null;
+                    JSONArray ja = null;
+
+                    json = json.getJSONObject(Imdb.data);
+
+                    this.imdbid = json.getString(Imdb.tconst);
+                    this.imdburl = Imdb.imdb + this.imdbid;
+                    this.rating = json.get(Imdb.rating) != null ? json.getDouble(Imdb.rating) : 0.0;
+                    this.votes = json.getInt(Imdb.numVotes);
+                    js = json.getJSONObject(Imdb.runtime);
+                    this.runtime = String.valueOf(js != null ? js.get(Imdb.time) : "");
+                    this.title = json.getString(Imdb.title);
+                    this.year = json.getInt(Imdb.year);
+                    this.tagline = json.get(Imdb.tagline) != null ? json.getString(Imdb.tagline) : "";
+                    this.plot = json.getJSONObject(Imdb.plot) != null ? json.getJSONObject(Imdb.plot).getString(Imdb.outline) : "";
+                    ja = json.getJSONArray(Imdb.genres);
+                    this.genres = ja.toString().replaceAll("\\[|\\]", "").replaceAll("\\\"", "");
+                    js = json.getJSONObject(Imdb.image);
+                    this.posterUrl = js != null ? js.getString(Imdb.url) : "";
+
+                    ja = json.getJSONArray(Imdb.directors);
+                    this.director = ja.toString(Imdb.name);
+
+                    ja = json.getJSONArray(Imdb.writers);
+                    this.writer = ja.toString(Imdb.name);
+
+                    ja = json.getJSONArray(Imdb.cast);
+                    this.actors = ja.toString(Imdb.name);
+
+
+                    break;
+                case AppIMDBFind:
+                    this.imdbid = json.getString(Imdb.tconst);
+                    this.imdburl = Imdb.imdb + this.imdbid;
+                    this.title = json.getString(Imdb.title);
+                    this.year = json.getInt(Imdb.year);
+                    this.posterUrl = json.getJSONObject(Imdb.image) != null ? json.getJSONObject(Imdb.image).getString(Imdb.url) : "";
+                    break;
+            }
+        }
     }
 
     @Override
     public String toString() {
         return "Movie{" + "imdbid=" + imdbid + ", title=" + title + ", year=" + year + ", rating=" + rating + '}';
-    }
-
-    public Movie jsonToObject(JSONObject json, SearchAPI api) throws JSONException {
-
-        if (json == null) {
-            return null;
-        }
-
-        switch (api) {
-            case IMDBApi:
-                if (!json.get("Response").toString().equals("True")) {
-                    return null;
-                }
-                this.released = json.getString("Released");
-                this.runtime = json.getString("Runtime");
-                this.posterUrl = json.getString("Poster");
-                this.title = json.getString("Title");
-                this.year = json.getInt("Year");
-                this.rated = json.getString("Rated");
-                this.actors = json.getString("Actors");
-                this.votes = json.getInt("Votes");
-                this.plot = json.getString("Plot");
-                this.writer = json.getString("Writer");
-                this.rating = Double.parseDouble(json.get("Rating").toString().equals("n/a") ? "0.0" : json.get("Rating").toString());
-                this.imdbid = json.getString("ID");
-                this.genres = json.getString("Genre");
-
-                break;
-            case DeanclatWorthy:
-
-                try {
-                    String error = json.getString("error");
-                    if (!error.isEmpty()) {
-                        return null;
-                    }
-                } catch (Exception e) {
-
-                    this.imdbid = json.getString("imdbid");
-                    this.title = json.getString("title");
-                    this.runtime = json.getString("runtime");
-                    this.rating = Double.parseDouble(json.get("rating").toString().equals("n/a") ? "0.0" : json.get("rating").toString());
-                    this.votes = json.getInt("votes");
-                    this.genres = json.getString("genres");
-                    this.year = json.getInt("year");
-                    this.imdburl = json.getString("imdburl");
-                    this.country = json.getString("country");
-                    this.stv = json.getInt("stv");
-                    this.languages = json.getString("languages");
-                }
-                break;
-            case AppIMDB:
-                JSONObject js = null;
-                JSONArray ja = null;
-                json = json.getJSONObject("data");
-
-                this.imdbid = json.getString("tconst");
-                this.imdburl = Imdb.imdb + this.imdbid;
-                this.rating = json.get("rating") != null ? json.getDouble("rating") : 0.0;
-                this.votes = json.getInt("num_votes");
-                js = json.getJSONObject("runtime");
-                this.runtime = String.valueOf(js != null ? js.get("time") : "");
-                this.title = json.getString("title");
-                this.year = json.getInt("year");
-                this.tagline = json.get("tagline") != null ? json.getString("tagline") : "";
-                this.plot = json.getJSONObject("plot") != null ? json.getJSONObject("plot").getString("outline") : "";
-                ja = json.getJSONArray("genres");
-                this.genres = ja.toString().replaceAll("\\[|\\]", "").replaceAll("\\\"", "");
-                js = json.getJSONObject("image");
-                this.posterUrl = js != null ? js.getString("url") : "";
-                ja = json.getJSONArray("directors_summary");
-                for (int i = 0; i < ja.length(); i++) {
-                    js = ja.optJSONObject(i).getJSONObject("name");                   
-                    this.director += js.getString("name")+",";                    
-                }
-                ja = json.getJSONArray("writers_summary");
-                for (int i = 0; i < ja.length(); i++) {
-                    js = ja.optJSONObject(i).getJSONObject("name");   
-                    this.writer += js.getString("name")+",";                    
-                }
-                ja = json.getJSONArray("cast_summary");
-                for (int i = 0; i < ja.length(); i++) {
-                    js = ja.optJSONObject(i).getJSONObject("name");   
-                    this.actors += js.getString("name")+",";                    
-                }
-                break;
-            case AppIMDBFind:
-                this.imdbid = json.getString("tconst");
-                this.imdburl = Imdb.imdb + this.imdbid;
-                this.title = json.getString("title");
-                this.year = json.getInt("year");
-                this.posterUrl = json.getJSONObject("image") != null ? json.getJSONObject("image").getString("url") : "";
-                break;
-        }
-
-
-        return this;
     }
 
     @Override
@@ -332,15 +227,6 @@ public class Movie {
             return false;
         }
         if ((this.runtime == null) ? (other.runtime != null) : !this.runtime.equals(other.runtime)) {
-            return false;
-        }
-        if ((this.country == null) ? (other.country != null) : !this.country.equals(other.country)) {
-            return false;
-        }
-        if (this.stv != other.stv) {
-            return false;
-        }
-        if ((this.languages == null) ? (other.languages != null) : !this.languages.equals(other.languages)) {
             return false;
         }
         if ((this.title == null) ? (other.title != null) : !this.title.equals(other.title)) {
