@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
@@ -88,6 +89,14 @@ public class ListMovies extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         txtImdbID = new javax.swing.JTextField();
         btnRename = new javax.swing.JButton();
+        jXTaskPane1 = new org.jdesktop.swingx.JXTaskPane();
+        lblGenero = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        lblRatingAdvancedSearch = new javax.swing.JLabel();
+        cmbOption = new javax.swing.JComboBox();
+        txtRating = new javax.swing.JTextField();
+        btnNewSearch = new javax.swing.JButton();
+        ckbAlreadySeen = new javax.swing.JCheckBox();
         btnListAll = new javax.swing.JButton();
         ckbTitle = new javax.swing.JCheckBox();
         ckbImdbID = new javax.swing.JCheckBox();
@@ -121,8 +130,10 @@ public class ListMovies extends javax.swing.JFrame {
         txtDirectors = new javax.swing.JTextArea();
         jLabel13 = new javax.swing.JLabel();
         btnOpen = new javax.swing.JButton();
+        btnAddWatchList = new javax.swing.JToggleButton();
         jScrollPane8 = new javax.swing.JScrollPane();
         tMovies = new org.jdesktop.swingx.JXTable();
+        ckbStats = new javax.swing.JCheckBox();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu2 = new javax.swing.JMenu();
         mItemOrganize = new javax.swing.JMenuItem();
@@ -131,6 +142,11 @@ public class ListMovies extends javax.swing.JFrame {
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/moviedb/ui/Bundle"); // NOI18N
         setTitle(bundle.getString("ListMovies.title")); // NOI18N
 
+        listMovies.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                listMoviesMouseClicked(evt);
+            }
+        });
         listMovies.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 listMoviesValueChanged(evt);
@@ -171,6 +187,61 @@ public class ListMovies extends javax.swing.JFrame {
 
         txtImdbID.setToolTipText(bundle.getString("ListMovies.txtImdbID.toolTipText")); // NOI18N
 
+        btnRename.setText(bundle.getString("ListMovies.btnRename.text")); // NOI18N
+        btnRename.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRenameActionPerformed(evt);
+            }
+        });
+
+        jXTaskPane1.setCollapsed(true);
+        jXTaskPane1.setTitle(bundle.getString("ListMovies.jXTaskPane1.title")); // NOI18N
+
+        lblGenero.setText(bundle.getString("ListMovies.lblGenero.text")); // NOI18N
+
+        jTextField1.setText(bundle.getString("ListMovies.jTextField1.text")); // NOI18N
+
+        lblRatingAdvancedSearch.setText(bundle.getString("ListMovies.lblRatingAdvancedSearch.text")); // NOI18N
+
+        cmbOption.setModel(new javax.swing.DefaultComboBoxModel(new String[] { ">=", "<=" }));
+
+        txtRating.setText(bundle.getString("ListMovies.txtRating.text")); // NOI18N
+
+        javax.swing.GroupLayout jXTaskPane1Layout = new javax.swing.GroupLayout(jXTaskPane1.getContentPane());
+        jXTaskPane1.getContentPane().setLayout(jXTaskPane1Layout);
+        jXTaskPane1Layout.setHorizontalGroup(
+            jXTaskPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jXTaskPane1Layout.createSequentialGroup()
+                .addComponent(lblGenero)
+                .addGap(18, 18, 18)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblRatingAdvancedSearch)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmbOption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtRating, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        jXTaskPane1Layout.setVerticalGroup(
+            jXTaskPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jXTaskPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(lblGenero)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jXTaskPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblRatingAdvancedSearch)
+                    .addComponent(cmbOption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtRating, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+
+        btnNewSearch.setText(bundle.getString("ListMovies.btnNewSearch.text")); // NOI18N
+        btnNewSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNewSearchActionPerformed(evt);
+            }
+        });
+
+        ckbAlreadySeen.setText(bundle.getString("ListMovies.ckbAlreadySeen.text")); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -179,23 +250,33 @@ public class ListMovies extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel1))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtYear, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel3)
-                                .addGap(18, 18, 18)
-                                .addComponent(txtImdbID, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(txtTitle)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(btnNewSearch)
+                        .addGap(52, 52, 52)
+                        .addComponent(btnRename)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnSerachInside)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnSerachOutside)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(btnSerachOutside))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jXTaskPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel1))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(txtTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 413, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(txtYear, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel3)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(txtImdbID, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(ckbAlreadySeen)))))
+                        .addGap(0, 47, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -209,20 +290,18 @@ public class ListMovies extends javax.swing.JFrame {
                     .addComponent(jLabel2)
                     .addComponent(txtYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3)
-                    .addComponent(txtImdbID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtImdbID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ckbAlreadySeen))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jXTaskPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSerachInside)
-                    .addComponent(btnSerachOutside))
-                .addContainerGap())
+                    .addComponent(btnSerachOutside)
+                    .addComponent(btnRename)
+                    .addComponent(btnNewSearch))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        btnRename.setText(bundle.getString("ListMovies.btnRename.text")); // NOI18N
-        btnRename.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRenameActionPerformed(evt);
-            }
-        });
 
         btnListAll.setText(bundle.getString("ListMovies.btnListAll.text")); // NOI18N
         btnListAll.addActionListener(new java.awt.event.ActionListener() {
@@ -337,6 +416,13 @@ public class ListMovies extends javax.swing.JFrame {
             }
         });
 
+        btnAddWatchList.setText(bundle.getString("ListMovies.btnAddWatchList.text")); // NOI18N
+        btnAddWatchList.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddWatchListActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pDetailsLayout = new javax.swing.GroupLayout(pDetails);
         pDetails.setLayout(pDetailsLayout);
         pDetailsLayout.setHorizontalGroup(
@@ -358,38 +444,39 @@ public class ListMovies extends javax.swing.JFrame {
                     .addComponent(jLabel13))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pDetailsLayout.createSequentialGroup()
-                        .addComponent(btnOpen)
-                        .addContainerGap())
                     .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(pDetailsLayout.createSequentialGroup()
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 346, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addContainerGap())
-                        .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pDetailsLayout.createSequentialGroup()
+                            .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jScrollPane7)
+                                .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pDetailsLayout.createSequentialGroup()
+                                    .addComponent(lblYear, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jLabel6)
+                                    .addGap(3, 3, 3)
+                                    .addComponent(lblRating, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(lblRuntime, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.LEADING))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(pDetailsLayout.createSequentialGroup()
+                                    .addComponent(jLabel7)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(lblVotes, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(pPoster, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(35, 35, 35)))
+                    .addGroup(pDetailsLayout.createSequentialGroup()
+                        .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 346, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(pDetailsLayout.createSequentialGroup()
-                                .addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
-                            .addGroup(pDetailsLayout.createSequentialGroup()
-                                .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jScrollPane7)
-                                    .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pDetailsLayout.createSequentialGroup()
-                                        .addComponent(lblYear, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel6)
-                                        .addGap(3, 3, 3)
-                                        .addComponent(lblRating, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(lblRuntime, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.LEADING))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(pDetailsLayout.createSequentialGroup()
-                                        .addComponent(jLabel7)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(lblVotes, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(pPoster, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(35, 35, 35))))))
+                                .addComponent(btnOpen)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnAddWatchList)))
+                        .addContainerGap())))
         );
         pDetailsLayout.setVerticalGroup(
             pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -435,8 +522,10 @@ public class ListMovies extends javax.swing.JFrame {
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel11))
                 .addGap(18, 18, 18)
-                .addComponent(btnOpen)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnOpen)
+                    .addComponent(btnAddWatchList))
+                .addContainerGap(53, Short.MAX_VALUE))
         );
 
         tMovies.setModel(this.getModel());
@@ -446,6 +535,9 @@ public class ListMovies extends javax.swing.JFrame {
             }
         });
         jScrollPane8.setViewportView(tMovies);
+
+        ckbStats.setSelected(true);
+        ckbStats.setText(bundle.getString("ListMovies.ckbStats.text")); // NOI18N
 
         jMenu2.setText("Tools");
 
@@ -469,12 +561,12 @@ public class ListMovies extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnRename)
-                        .addGap(8, 8, 8)
                         .addComponent(ckbTitle)
-                        .addGap(5, 5, 5)
-                        .addComponent(ckbYear)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(ckbYear)
+                        .addGap(11, 11, 11)
+                        .addComponent(ckbStats)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(ckbImdbID))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
@@ -483,11 +575,11 @@ public class ListMovies extends javax.swing.JFrame {
                         .addComponent(btnListAll)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(18, 18, 18)
-                        .addComponent(jScrollPane8)))
+                        .addComponent(jScrollPane8))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pDetails, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -498,17 +590,17 @@ public class ListMovies extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnRename)
-                            .addComponent(ckbTitle)
-                            .addComponent(ckbYear)
-                            .addComponent(ckbImdbID))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(ckbTitle)
+                            .addComponent(ckbYear)
+                            .addComponent(ckbImdbID)
+                            .addComponent(ckbStats))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane1))
                     .addComponent(pDetails, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(49, 49, 49)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -550,7 +642,7 @@ public class ListMovies extends javax.swing.JFrame {
                 txtYear.setText(mYear.group(0));
             }
 
-            name = name.replaceAll("#.tt\\d{7,}", "").replaceAll("(19|20)\\d\\d", "").replaceAll("\\.|\\[|]|\\-", " ").trim();
+            name = name.replaceAll("#.tt\\d{7,}", "").replaceAll("(19|20)\\d\\d", "").replaceAll("\\.|\\[|]|\\-", " ").replaceAll("!X", "").trim();
 
             Util util = new Util();
             try {
@@ -628,6 +720,11 @@ public class ListMovies extends javax.swing.JFrame {
                         if (ckbImdbID.isSelected()) {
                             name += " # " + movie.getImdbid();
                         }
+                        if (ckbStats.isSelected()) {
+                            if (movie.isWatched()) {
+                                name += " !X";
+                            }
+                        }
                         if (!name.isEmpty()) {
                             renameFile(diretorioSelecionado, name);
                         } else {
@@ -693,6 +790,32 @@ public class ListMovies extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_tMoviesMouseClicked
 
+    private void btnNewSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewSearchActionPerformed
+        clearFilterFields();
+        clearDetails();
+    }//GEN-LAST:event_btnNewSearchActionPerformed
+
+    private void btnAddWatchListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddWatchListActionPerformed
+        try {
+            addToWatchList(movie);
+        } catch (Exception ex) {
+            logger.error("Erro ao adicionar a lista", ex);
+        }
+    }//GEN-LAST:event_btnAddWatchListActionPerformed
+
+    private void listMoviesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listMoviesMouseClicked
+        if (evt.getClickCount() == 2) {
+            try {
+                searchInside();
+                if (movie == null) {
+                    searchOutside();
+                }
+            } catch (Exception ex) {
+                logger.error("Erro ao buscar", ex);
+            }
+        }
+    }//GEN-LAST:event_listMoviesMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -711,6 +834,8 @@ public class ListMovies extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
+
                 }
             }
         } catch (ClassNotFoundException ex) {
@@ -735,16 +860,21 @@ public class ListMovies extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JToggleButton btnAddWatchList;
     private javax.swing.JButton btnListAll;
+    private javax.swing.JButton btnNewSearch;
     private javax.swing.JButton btnOpen;
     private javax.swing.JButton btnRename;
     private javax.swing.JButton btnSerachInside;
     private javax.swing.JButton btnSerachOutside;
     private javax.swing.JButton btnUpdate;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JCheckBox ckbAlreadySeen;
     private javax.swing.JCheckBox ckbImdbID;
+    private javax.swing.JCheckBox ckbStats;
     private javax.swing.JCheckBox ckbTitle;
     private javax.swing.JCheckBox ckbYear;
+    private javax.swing.JComboBox cmbOption;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -768,8 +898,12 @@ public class ListMovies extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JTextField jTextField1;
+    private org.jdesktop.swingx.JXTaskPane jXTaskPane1;
+    private javax.swing.JLabel lblGenero;
     private javax.swing.JLabel lblPoster;
     private javax.swing.JLabel lblRating;
+    private javax.swing.JLabel lblRatingAdvancedSearch;
     private javax.swing.JLabel lblRuntime;
     private javax.swing.JLabel lblTitle;
     private javax.swing.JLabel lblVotes;
@@ -784,6 +918,7 @@ public class ListMovies extends javax.swing.JFrame {
     private javax.swing.JTextArea txtGenres;
     private javax.swing.JTextField txtImdbID;
     private javax.swing.JTextArea txtPlot;
+    private javax.swing.JTextField txtRating;
     private javax.swing.JTextField txtTitle;
     private javax.swing.JTextArea txtWriter;
     private javax.swing.JTextField txtYear;
@@ -813,6 +948,7 @@ public class ListMovies extends javax.swing.JFrame {
         lblYear.setText("");
         lblPoster.setText("");
         lblPoster.setIcon(null);
+        btnAddWatchList.setSelected(false);
     }
 
     private void populateFilterFields(Movie movie) {
@@ -836,6 +972,11 @@ public class ListMovies extends javax.swing.JFrame {
         txtDirectors.setText(movie.getDirector());
         lblYear.setText(String.valueOf(movie.getYear()));
         lblPoster.setText(bundle.getString("LOADING"));
+        if (movie.isWatched()) {
+            btnAddWatchList.setSelected(true);
+        } else {
+            btnAddWatchList.setSelected(false);
+        }
 
         if (!movie.getPosterUrl().isEmpty()) {
             final String url;
@@ -941,6 +1082,7 @@ public class ListMovies extends javax.swing.JFrame {
             movie = dao.buscar(txtTitle.getText());
         }
         clearMoviesTable();
+        clearDetails();
         if (movie != null) {
             addMoviesToList(movie);
             populateDetails(movie);
@@ -1171,5 +1313,18 @@ public class ListMovies extends javax.swing.JFrame {
 
         }
 
+    }
+
+    private void addToWatchList(Movie movie) throws Exception {
+        if (movie != null) {
+            if (movie.isWatched()) {
+                movie.setWatched(false);
+            } else {
+                movie.setWatched(true);
+            }
+
+            dao = new DAOMovie();
+            dao.salvar(movie);
+        }
     }
 }

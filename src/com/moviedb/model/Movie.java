@@ -33,6 +33,7 @@ public class Movie implements Serializable {
     private int year;
     private String imdburl;
     private String tagline;
+    private boolean watched;
 
     /**
      * 
@@ -149,6 +150,16 @@ public class Movie implements Serializable {
     public void setYear(int year) {
         this.year = year;
     }
+
+    public boolean isWatched() {
+        return watched;
+    }
+
+    public void setWatched(boolean watched) {
+        this.watched = watched;
+    }
+    
+    
 
     public Movie() {
     }
