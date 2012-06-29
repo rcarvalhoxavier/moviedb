@@ -15,12 +15,15 @@ import com.moviedb.persistence.DAOMovie;
 import com.moviedb.util.ImageUtil;
 import com.moviedb.model.SearchAPI;
 import com.moviedb.controler.SearchIMDB;
+import com.moviedb.util.Configuration;
 import com.moviedb.util.Util;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -134,6 +137,9 @@ public class ListMovies extends javax.swing.JFrame {
         jScrollPane8 = new javax.swing.JScrollPane();
         tMovies = new org.jdesktop.swingx.JXTable();
         ckbStats = new javax.swing.JCheckBox();
+        lblContent = new org.jdesktop.swingx.JXLabel();
+        jScrollPane9 = new javax.swing.JScrollPane();
+        listContent = new javax.swing.JList();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu2 = new javax.swing.JMenu();
         mItemOrganize = new javax.swing.JMenuItem();
@@ -225,12 +231,12 @@ public class ListMovies extends javax.swing.JFrame {
         jXTaskPane1Layout.setVerticalGroup(
             jXTaskPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jXTaskPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(lblRatingAdvancedSearch)
+                .addComponent(cmbOption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtRating, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(jXTaskPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                 .addComponent(lblGenero)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(jXTaskPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblRatingAdvancedSearch)
-                    .addComponent(cmbOption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtRating, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         btnNewSearch.setText(bundle.getString("ListMovies.btnNewSearch.text")); // NOI18N
@@ -525,7 +531,7 @@ public class ListMovies extends javax.swing.JFrame {
                 .addGroup(pDetailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnOpen)
                     .addComponent(btnAddWatchList))
-                .addContainerGap(53, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         tMovies.setModel(this.getModel());
@@ -538,6 +544,20 @@ public class ListMovies extends javax.swing.JFrame {
 
         ckbStats.setSelected(true);
         ckbStats.setText(bundle.getString("ListMovies.ckbStats.text")); // NOI18N
+
+        lblContent.setText(bundle.getString("ListMovies.lblContent.text")); // NOI18N
+
+        listContent.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                listContentMouseClicked(evt);
+            }
+        });
+        listContent.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                listContentValueChanged(evt);
+            }
+        });
+        jScrollPane9.setViewportView(listContent);
 
         jMenu2.setText("Tools");
 
@@ -568,11 +588,13 @@ public class ListMovies extends javax.swing.JFrame {
                         .addComponent(ckbStats)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(ckbImdbID))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnUpdate)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnListAll)))
+                        .addComponent(btnListAll))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblContent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(18, 18, 18)
@@ -588,21 +610,25 @@ public class ListMovies extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 512, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(ckbTitle)
                             .addComponent(ckbYear)
                             .addComponent(ckbImdbID)
                             .addComponent(ckbStats))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane1))
+                        .addComponent(jScrollPane1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblContent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(pDetails, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(49, 49, 49)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnUpdate)
                     .addComponent(btnListAll))
@@ -625,55 +651,66 @@ public class ListMovies extends javax.swing.JFrame {
     }//GEN-LAST:event_btnUpdateActionPerformed
 
     private void listMoviesValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listMoviesValueChanged
-        int[] selected = listMovies.getSelectedIndices();
-        if (selected.length == 1) {
-            clearFilterFields();
-            diretorioSelecionado = (File) ((DefaultListModel) listMovies.getModel()).get(listMovies.getSelectedIndex());
 
-            String name = diretorioSelecionado.getName();
-            Pattern pattern = Pattern.compile("#.tt\\d{7,}");
-            Matcher mIMDBId = pattern.matcher(name);
-            if (mIMDBId.find()) {
-                txtImdbID.setText(mIMDBId.group(0).replace("#", "").trim());
-            }
-            pattern = Pattern.compile("(19|20)\\d\\d");
-            Matcher mYear = pattern.matcher(name);
-            if (mYear.find()) {
-                txtYear.setText(mYear.group(0));
-            }
+        try {
+            int[] selected = listMovies.getSelectedIndices();
+            if (selected.length == 1) {
+                clearFilterFields();
+                diretorioSelecionado = (File) ((DefaultListModel) listMovies.getModel()).get(listMovies.getSelectedIndex());
 
-            name = name.replaceAll("#.tt\\d{7,}", "").replaceAll("(19|20)\\d\\d", "").replaceAll("\\.|\\[|]|\\-", " ").replaceAll("!X", "").trim();
+                populateListContent(diretorioSelecionado);
 
-            Util util = new Util();
-            try {
-                util.readProperties("app.config");
-                String path = util.getProperties().getProperty("replaceRegex", "vazio");
-
-                for (String p : path.split(" ")) {
-                    name = name.replaceAll(p.trim(), "");
+                String name = diretorioSelecionado.getName();
+                Pattern pattern = Pattern.compile("#.tt\\d{7,}");
+                Matcher mIMDBId = pattern.matcher(name);
+                if (mIMDBId.find()) {
+                    txtImdbID.setText(mIMDBId.group(0).replace("#", "").trim());
                 }
-            } catch (IOException ex) {
-                logger.error("Erro ao ler arquivo app.config ", ex);
-            }
+                pattern = Pattern.compile("(19|20)\\d\\d");
+                Matcher mYear = pattern.matcher(name);
+                if (mYear.find()) {
+                    txtYear.setText(mYear.group(0));
+                }
 
-            txtTitle.setText(name);
+                name = name.replaceAll("#.tt\\d{7,}", "").replaceAll("(19|20)\\d\\d", "").replaceAll("\\.|\\[|]|\\-", " ").replaceAll("!X", "").trim();
 
-        } else if (selected.length > 1) {
-            clearFilterFields();
-            dao = new DAOMovie();
-            movies = dao.listar();
-            List<Movie> moviesFounded = new ArrayList<Movie>();
-            for (int _selected : selected) {
-                for (Movie _movie : movies) {
-                    diretorioSelecionado = (File) ((DefaultListModel) listMovies.getModel()).get(_selected);
-                    String imdbID = getMovieID(diretorioSelecionado.getName());
-                    if (_movie.getImdbid().equals(imdbID)) {
-                        moviesFounded.add(_movie);
+                Util util = new Util();
+                try {
+                    util.readProperties("app.config");
+                    String path = util.getProperties().getProperty("replaceRegex", "vazio");
+
+                    for (String p : path.split(" ")) {
+                        name = name.replaceAll(p.trim(), "");
+                    }
+                } catch (IOException ex) {
+                    logger.error("Erro ao ler arquivo app.config ", ex);
+                }
+
+                txtTitle.setText(name);
+
+            } else if (selected.length > 1) {
+                clearFilterFields();
+                dao = new DAOMovie();
+                movies = dao.listar();
+                List<Movie> moviesFounded = new ArrayList<Movie>();
+                for (int _selected : selected) {
+                    for (Movie _movie : movies) {
+                        diretorioSelecionado = (File) ((DefaultListModel) listMovies.getModel()).get(_selected);
+                        String imdbID = getMovieID(diretorioSelecionado.getName());
+                        if (_movie.getImdbid().equals(imdbID)) {
+                            moviesFounded.add(_movie);
+                        }
                     }
                 }
-            }
 
-            addMoviesToList(moviesFounded);
+                addMoviesToList(moviesFounded);
+            }
+        } catch (FileNotFoundException ex) {
+            logger.error(ex);
+            JOptionPane.showMessageDialog(null, ex.getMessage());
+        } catch (Exception ex) {
+            logger.error(ex);
+            JOptionPane.showMessageDialog(null, ex.getMessage());
         }
     }//GEN-LAST:event_listMoviesValueChanged
 
@@ -816,6 +853,20 @@ public class ListMovies extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_listMoviesMouseClicked
 
+    private void listContentMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listContentMouseClicked
+        if (evt.getClickCount() == 2) {
+            try {
+
+            } catch (Exception ex) {
+                logger.error("Erro ao buscar", ex);
+            }
+        }
+    }//GEN-LAST:event_listContentMouseClicked
+
+    private void listContentValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listContentValueChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_listContentValueChanged
+
     /**
      * @param args the command line arguments
      */
@@ -898,8 +949,10 @@ public class ListMovies extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JTextField jTextField1;
     private org.jdesktop.swingx.JXTaskPane jXTaskPane1;
+    private org.jdesktop.swingx.JXLabel lblContent;
     private javax.swing.JLabel lblGenero;
     private javax.swing.JLabel lblPoster;
     private javax.swing.JLabel lblRating;
@@ -908,6 +961,7 @@ public class ListMovies extends javax.swing.JFrame {
     private javax.swing.JLabel lblTitle;
     private javax.swing.JLabel lblVotes;
     private javax.swing.JLabel lblYear;
+    private javax.swing.JList listContent;
     private javax.swing.JList listMovies;
     private javax.swing.JMenuItem mItemOrganize;
     private javax.swing.JPanel pDetails;
@@ -928,6 +982,7 @@ public class ListMovies extends javax.swing.JFrame {
     private List<Movie> movies;
     private SearchIMDB search;
     private File diretorioSelecionado;
+    private File arquivoSelecionado;
     static final Logger logger = Logger.getLogger(ListMovies.class);
 
     private void clearFilterFields() {
@@ -1181,119 +1236,64 @@ public class ListMovies extends javax.swing.JFrame {
     }
 
     private void populateDirectoriesList() throws FileNotFoundException, Exception {
-        DefaultListModel modelo = new DefaultListModel() {
-
-            @Override
-            public Object getElementAt(int i) {
-                return ((File) super.getElementAt(i)).getName();
-            }
-        };
-        Collection<File> dirsFounded = listAllDirectoriesByPath();
-        for (File file : dirsFounded) {
-            modelo.addElement(file);
-        }
-
-        listMovies.setModel(modelo);
-    }
-
-    private Collection<File> listFilesByPath() throws FileNotFoundException, Exception {
-        Util util = new Util();
         try {
-            util.readProperties("app.config");
 
-            String path = util.getProperties().getProperty("path", "vazio");
+            Collection<File> dirsFounded = new ArrayList<File>();
+            DefaultListModel modelo = new DefaultListModel() {
 
-            Collection<File> filesFounded = new ArrayList<File>();
-
-            if (!path.equals("vazio")) {
-                for (String p : path.split(";")) {
-
-                    File directory = new File(p);
-                    File[] files = null;
-                    if (directory.isDirectory()) {
-                        files = directory.listFiles(new FileFilter() {
-
-                            public boolean accept(File pathname) {
-                                return pathname.isFile();
-                            }
-                        });
-                    }
-                    if (files != null) {
-                        System.out.println(files.length);
-                        filesFounded.addAll(Arrays.asList(files));
-                    }
+                @Override
+                public Object getElementAt(int i) {
+                    return ((File) super.getElementAt(i)).getName();
                 }
-            } else {
-                throw new Exception(bundle.getString("TAG PATH DONT FOUND"));
+            };
 
-            }
+            String path = new Configuration().getPath();
 
-            return filesFounded;
-        } catch (IOException ex) {
-            throw new FileNotFoundException(bundle.getString("FILE app.config DONT FOUND"));
-        }
-
-    }
-
-    private Collection<File> listAllDirectoriesByPath() throws FileNotFoundException, Exception {
-        Util util = new Util();
-        try {
-            util.readProperties("app.config");
-            Enumeration<Object> list = util.getProperties().keys();
-            while (list.hasMoreElements()) {
-                logger.info("keys founded: " + list.nextElement().toString());
-            }
-
-            String path = util.getProperties().getProperty("path", "vazio");
-            logger.info(path);
-
-            Collection<File> dirFounded = new ArrayList<File>();
-
-            if (!path.equals("vazio")) {
-                for (String p : path.split(";")) {
-
-                    File directory = new File(p);
-                    File[] directories = null;
-                    if (directory.isDirectory()) {
-                        directories = directory.listFiles(new FileFilter() {
-
-                            public boolean accept(File pathname) {
-                                return pathname.isDirectory();
-
-                            }
-                        });
-                    }
-                    if (directories != null) {
-                        System.out.println(directories.length);
-                        dirFounded.addAll(Arrays.asList(directories));
-                    }
-                }
-                logger.info("Dir founded: " + dirFounded.size());
-                return dirFounded;
-            } else {
+            if (path.isEmpty()) {
                 throw new Exception(bundle.getString("TAG PATH DONT FOUND"));
             }
+
+            for (String p : path.split(";")) {
+                dirsFounded.addAll(new Util().listFilesByPath(new File(p), 1));
+            }
+            logger.info("Dir founded: " + dirsFounded.size());
+
+            for (File file : dirsFounded) {
+                modelo.addElement(file);
+            }
+
+            listMovies.setModel(modelo);
 
         } catch (IOException ex) {
             throw new FileNotFoundException(bundle.getString("FILE app.config DONT FOUND"));
         }
-
     }
 
     private void organizeFilesInDirectories() throws FileNotFoundException, Exception {
         Util util = new Util();
+        Collection<File> filesFounded = new ArrayList<File>();
         try {
-            util.readProperties("app.config");
-            String extension = util.getProperties().getProperty("extension", "vazio");
-            String[] extensions = extension.split(";");
+            String path = new Configuration().getPath();
+            String extension = new Configuration().getExtensions();
 
-            Collection<File> filesFounded = listFilesByPath();
+
+            if (extension.isEmpty()) {
+                throw new Exception(bundle.getString("TAG PATH DONT FOUND"));
+            }
+            if (path.isEmpty()) {
+                throw new Exception(bundle.getString("TAG PATH DONT FOUND"));
+            }
+
+            for (String p : path.split(";")) {
+                filesFounded.addAll(util.listFilesByPath(new File(p), 0));
+            }
+
 
             for (File file : filesFounded) {
                 if (file.getName().lastIndexOf(".") > -1) {
                     String nameExtension = file.getName().substring(file.getName().lastIndexOf("."));
                     String onlyName = file.getName().substring(0, file.getName().lastIndexOf("."));
-                    for (String ex : extensions) {
+                    for (String ex : extension.split(";")) {
                         if (nameExtension.equals(ex)) {
                             File newDir = new File(file.getParent() + "/" + onlyName);
                             boolean success = (newDir).mkdir();
@@ -1307,7 +1307,6 @@ public class ListMovies extends javax.swing.JFrame {
                 }
 
             }
-
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, bundle.getString("FILE app.config DONT FOUND"));
 
@@ -1326,5 +1325,26 @@ public class ListMovies extends javax.swing.JFrame {
             dao = new DAOMovie();
             dao.salvar(movie);
         }
+    }
+
+    private void populateListContent(File diretorioSelecionado) throws FileNotFoundException, Exception {
+        Collection<File> filesFounded = new ArrayList<File>();
+        DefaultListModel modelo = new DefaultListModel() {
+
+            @Override
+            public Object getElementAt(int i) {
+                return ((File) super.getElementAt(i)).getName() + " - " + new Util().roundBit(((File) super.getElementAt(i)).length());
+            }
+        };
+
+        filesFounded.addAll(new Util().listFilesByPath(diretorioSelecionado, 0));
+
+        for (File file : filesFounded) {
+            logger.info(file.getName());
+            modelo.addElement(file);
+        }
+
+        listContent.setModel(modelo);
+
     }
 }

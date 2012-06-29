@@ -5,17 +5,13 @@
 package com.moviedb.util;
 
 import java.awt.Image;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Properties;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,8 +44,8 @@ public class Util {
             if (fis != null) {
                 properties.load(fis);
             }
-            fis.close();            
-            
+            fis.close();
+
         } catch (IOException ex) {
             throw ex;
         }
@@ -140,7 +136,7 @@ public class Util {
                     Runtime.getRuntime().exec(
                             "rundll32 url.dll,FileProtocolHandler " + url);
                 } else {
-                    String[] browsers = {"chromium-browser","chrome","firefox", "opera", "konqueror",
+                    String[] browsers = {"chromium-browser", "chrome", "firefox", "opera", "konqueror",
                         "epiphany", "mozilla", "netscape"};
                     String browser = null;
                     for (int count = 0; count < browsers.length && browser == null; count++) {
@@ -155,5 +151,44 @@ public class Util {
                 throw new Exception("Error in opening browser, URL: " + url);
             }
         }
+    }
+
+    public Collection<File> listFilesByPath(File directory, final int filter) throws FileNotFoundException, Exception {
+        Collection<File> filesFounded = new ArrayList<File>();
+
+        File[] files = null;
+        if (directory.isDirectory()) {
+            files = directory.listFiles(new FileFilter() {
+
+                @Override
+                public boolean accept(File pathname) {
+                    switch (filter) {
+                        case 0:
+                            return pathname.isFile();
+                        case 1:
+                            return pathname.isDirectory();
+                        default:
+                            return true;
+                    }
+                }
+            });
+        }
+        if (files != null) {
+            System.out.println(files.length);
+            filesFounded.addAll(Arrays.asList(files));
+        }
+
+        return filesFounded;
+
+
+    }
+
+    public String roundBit(long size) {
+        if (size <= 0) {
+            return "0";
+        }
+        final String[] units = new String[]{"B", "KB", "MB", "GB", "TB"};
+        int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
+        return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 }
