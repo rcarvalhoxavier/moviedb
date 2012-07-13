@@ -70,10 +70,16 @@ public class Util {
 
         URL url = new URL(_url);
 
+        //httpcon = (HttpURLConnection) url.openConnection();
+        //httpcon.addRequestProperty("User-Agent", "IMDb/2.6.1 (iPad; iPhone OS 5.1.1)");
+        //httpcon.addRequestProperty("Accept", "*/*");
+        //httpcon.addRequestProperty("Accept-Language", "pt-br");
+        //httpcon.addRequestProperty("Accept-Encoding", "gzip, deflate");
+        
         httpcon = (HttpURLConnection) url.openConnection();
         httpcon.addRequestProperty("User-Agent", "Mozilla/4.76");
-        InputStream is = httpcon.getInputStream();
-
+        InputStream is = httpcon.getInputStream();   
+        
         return is;
 
     }
@@ -81,10 +87,11 @@ public class Util {
     public static JSONObject getJSONFromURL(String u) throws IOException, JSONException {
         InputStream is = null;
         try {
-            is = new URL(u).openStream();
+            is = new URL(u).openStream();                        
         } catch (IOException e) {
-            is = getStreamFromUrl(u);
-        }
+            System.out.println(e.toString());
+            is = getStreamFromUrl(u);            
+        }           
 
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(is));
@@ -190,5 +197,34 @@ public class Util {
         final String[] units = new String[]{"B", "KB", "MB", "GB", "TB"};
         int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
         return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+    }
+    
+     public static void renameFile(File file, String newName) {
+        File filePath = file.getParentFile();
+        File[] directories = null;
+        final String name = newName;
+        if (filePath.isDirectory()) {
+            directories = filePath.listFiles(new FileFilter() {
+
+                public boolean accept(File pathname) {
+                    if (pathname.isDirectory()) {
+                        if (pathname.getName().equals(name)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                }
+            });
+        }
+        if (directories.length > 0) {
+            newName = newName + " " + (directories.length + 1);
+        }
+
+
+        newName = newName.replace("/", " ");
+        file.renameTo(new File(file.getParent() + "/" + newName));
     }
 }

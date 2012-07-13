@@ -14,7 +14,7 @@ public class Imdb {
     public static final String imdbTitlesExact = "Titles (Exact Matches)";
     public static final String imdbTitlesPartial = "Titles (Partial Matches)";
     public static final String imdb = "http://www.imdb.com/title/";
-    public static final String appImdbFind = "http://app.imdb.com/find?q=";
+    public static final String ImdbFind = "http://www.imdb.com/xml/find?json=1&tt=on&q=";
     public static final String appImdb = "http://app.imdb.com/title/";
     public static final String appImdb_maindetails = "/maindetails";
     public static final String data = "data";
@@ -34,11 +34,32 @@ public class Imdb {
     public static final String writers = "writers_summary";
     public static final String cast = "cast_summary";
     public static final String name = "name";
-    public static final String outline = "outline";
+    public static final String outline = "outline";    
     /*
-     * Search IMDB
+     * Search IMDB Find
      */
     public static final String label = "label";
     public static final String results = "results";
     public static final String list = "list";
+    
+    public static final String imdbFind_titlePopular = "title_popular";
+    public static final String imdbFind_titleSubstring = "title_substring";
+    public static final String imdbFind_titleApprox = "title_approx";
+    public static final String imdbFind_tconst = "id";
+    public static final String imdbFind_description = "description";
+    
+    /*
+     *  Search MediaImdb
+     */
+    public static final String mediaImdb = "http://sg.media-imdb.com";
+    public static final String mediaImdb_suggests = "/suggests/";
+    public static final String mediaImdb_data = "d";
+    public static final String mediaImdb_tconst = "id";
+    public static final String mediaImdb_cast = "s";
+    public static final String mediaImdb_title = "l";
+    public static final String mediaImdb_year = "y";
+    public static final String mediaImdb_image = "i";
+    public static final String mediaImdb_url = "0";
+    
+    
 }

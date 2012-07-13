@@ -5,6 +5,8 @@
 package com.moviedb.model;
 
 import java.io.Serializable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import org.json.JSONArray;
@@ -12,7 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * 
+ *
  * @author rcarvalhoxavier
  */
 @Entity
@@ -36,8 +38,8 @@ public class Movie implements Serializable {
     private boolean watched;
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public String getTagline() {
         return tagline;
@@ -158,8 +160,6 @@ public class Movie implements Serializable {
     public void setWatched(boolean watched) {
         this.watched = watched;
     }
-    
-    
 
     public Movie() {
     }
@@ -189,23 +189,39 @@ public class Movie implements Serializable {
                     js = json.getJSONObject(Imdb.image);
                     this.posterUrl = js != null ? js.getString(Imdb.url) : "";
 
-                    ja = json.getJSONArray(Imdb.directors);
+                    ja = json.get(Imdb.directors) != null ? json.getJSONArray(Imdb.directors) : new JSONArray();                    
                     this.director = ja.toString(Imdb.name);
 
-                    ja = json.getJSONArray(Imdb.writers);
+                    ja = json.get(Imdb.writers) != null ? json.getJSONArray(Imdb.writers) : new JSONArray();
                     this.writer = ja.toString(Imdb.name);
 
-                    ja = json.getJSONArray(Imdb.cast);
+                    ja = json.get(Imdb.cast) != null ? json.getJSONArray(Imdb.cast) : new JSONArray();
                     this.actors = ja.toString(Imdb.name);
 
 
                     break;
                 case AppIMDBFind:
-                    this.imdbid = json.getString(Imdb.tconst);
+                    this.imdbid = json.getString(Imdb.imdbFind_tconst);
                     this.imdburl = Imdb.imdb + this.imdbid;
-                    this.title = json.getString(Imdb.title);
-                    this.year = json.getInt(Imdb.year);
-                    this.posterUrl = json.getJSONObject(Imdb.image) != null ? json.getJSONObject(Imdb.image).getString(Imdb.url) : "";
+                    this.title = json.getString(Imdb.title).replace("&#x27;", "'");
+                    String description = json.optString(Imdb.imdbFind_description);
+
+                    Pattern pattern = Pattern.compile("(19|20)\\d\\d");
+                    Matcher mYear = pattern.matcher(description);
+                    if (mYear.find()) {
+                        this.year = Integer.parseInt(mYear.group(0));
+                    }
+
+                    //this.posterUrl = json.getJSONObject(Imdb.image) != null ? json.getJSONObject(Imdb.image).getString(Imdb.url) : "";
+                    break;
+                case mediaImdb:
+                    this.imdbid = json.getString(Imdb.mediaImdb_tconst);
+                    this.actors = json.getString(Imdb.mediaImdb_cast);
+                    this.title = json.getString(Imdb.mediaImdb_title);
+                    this.year = json.getInt(Imdb.mediaImdb_year);
+                    ja = json.get(Imdb.mediaImdb_image) != null ? json.getJSONArray(Imdb.mediaImdb_image) : new JSONArray();
+                    this.posterUrl = ja != null ? ja.getString(0) : "";
+
                     break;
             }
         }

@@ -10,5 +10,6 @@ package com.moviedb.model;
  */
 public enum SearchAPI {        
     AppIMDB,
-    AppIMDBFind
+    AppIMDBFind,
+    mediaImdb
 }
