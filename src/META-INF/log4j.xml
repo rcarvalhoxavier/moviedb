@@ -1,31 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<log4j:configuration>
-
-    <appender name="console" class="org.apache.log4j.ConsoleAppender">
-        <param name="threshold" value="DEBUG"/>
-        <param name="encoding" value="UTF-8"/>
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+    <appender name="CA" class="org.apache.log4j.ConsoleAppender">
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d %-5p (%30.30c) - %m%n"/>
+            <param name="ConversionPattern" value="%-4r [%t] %-5p %c %x - %m%n" />
         </layout>
     </appender>
-
-    <appender name="fileAppender" class="org.apache.log4j.RollingFileAppender">
-        <param name="maxFileSize" value="128KB" />
-        <param name="maxBackupIndex" value="1"/>
-        <param name="file" value="log/mcs.log"/>
+    <appender name="file" class="org.apache.log4j.FileAppender">
+        <param name="File" value="moviedb.log" />
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d %-5p (%30.30c) - %m%n"/>
+            <param name="ConversionPattern" value="%-5p %t [%-40.40c] %x - %m%n"/>
         </layout>
     </appender>
-
-    <logger name="org.hibernate">
-        <level value="WARN" />
-    </logger>
-
+        
+        
     <root>
-        <level value="DEBUG"/>
-        <appender-ref ref="console"/>
-        <appender-ref ref="fileAppender"/>
+        <level value="debug" />
+        <appender-ref ref="CA" />
+        <appender-ref ref="file" />
     </root>
-
 </log4j:configuration>

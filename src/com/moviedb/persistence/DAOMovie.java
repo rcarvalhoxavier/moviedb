@@ -1,17 +1,21 @@
 /**
- * 
+ *
  */
 package com.moviedb.persistence;
 
 import com.moviedb.model.Movie;
 import java.io.Serializable;
 import java.lang.String;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.EntityTransaction;
-
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 public class DAOMovie implements Serializable {
 
@@ -37,53 +41,57 @@ public class DAOMovie implements Serializable {
     }
 
     public List<Movie> listar() {
-        
-        Query query = entityManager.createQuery("from Movie ");
 
-        @SuppressWarnings("unchecked")
-        List<Movie> resultList = query.getResultList();
-
-        return resultList;
-    }
-
-    public Movie buscar(String title) {
-        //        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-//        CriteriaQuery<Apontamento> criteriaQuery = criteriaBuilder.createQuery(Apontamento.class);
-//        Root<Apontamento> apontamento = criteriaQuery.from(Apontamento.class);
-//        
-//        Predicate predicate = criteriaBuilder.and();
-//        
-//        Order order;
-//    
-        
-        entityManager = ConnectionFactory.getEntityManager();              
-        
-        Query query = entityManager.createQuery("from Movie f where f.title = ?1");
-        query.setParameter(1, title);
-
-        List<Movie> lista = query.getResultList();
-
-        return (lista.isEmpty() ? null : lista.get(0));
-
-    }
-
-    public Movie buscar(String title, int year) {
         entityManager = ConnectionFactory.getEntityManager();
-        
-//         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-//        CriteriaQuery<Movie> criteriaQuery = criteriaBuilder.createQuery(Movie.class);
-//        Root<Movie> movie = criteriaQuery.from(Movie.class);
-//        
-//        Predicate predicate = criteriaBuilder.and();
-        
-        Query query = entityManager.createQuery("from Movie f where f.title = ?1 and f.year = ?2");
-        query.setParameter(1, title);
-        query.setParameter(2, year);
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
-        List<Movie> lista = query.getResultList();        
+        CriteriaQuery<Movie> query = cb.createQuery(Movie.class);
+        Root<Movie> root = query.from(Movie.class);
 
-        return (lista.isEmpty() ? null : lista.get(0));
+        return entityManager.createQuery(query).getResultList();
     }
+    
+
+    public List<Movie> buscar(String title, int year, String genero, boolean assistido,boolean maior,double nota) {
+        entityManager = ConnectionFactory.getEntityManager();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+
+        CriteriaQuery<Movie> query = cb.createQuery(Movie.class);
+        Root<Movie> root = query.from(Movie.class);
+        
+        List<Predicate> listPredicate = new ArrayList<Predicate>();
+
+        if (title != null && !title.isEmpty()) {
+            listPredicate.add(cb.like(root.<String>get("title"), title));
+        }
+        if (year > 0) {
+            listPredicate.add(cb.equal(root.<String>get("year"), year));
+        }
+        if (genero != null && !genero.isEmpty()) {
+            listPredicate.add(cb.like(cb.upper(root.<String>get("genres")), "%" + genero.toUpperCase() + "%"));
+        }
+        if (assistido) {
+            listPredicate.add(cb.equal(root.<String>get("watched"), assistido));
+        }
+        if(nota > 0){
+            if(maior){
+                listPredicate.add(cb.greaterThanOrEqualTo(root.<Double>get("rating"), nota));
+            }else
+            {
+                listPredicate.add(cb.lessThanOrEqualTo(root.<Double>get("rating"), nota));
+            }                
+        }
+            
+
+        if (listPredicate.size() > 0) {
+            Predicate[] predicates = new Predicate[listPredicate.size()];
+            query.where(listPredicate.toArray(predicates));
+        }
+
+        return entityManager.createQuery(query).getResultList();
+
+    }
+   
 
     public Movie buscar(Movie obj) {
         return entityManager.find(Movie.class, obj.getImdbid());
